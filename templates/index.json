@@ -22,42 +22,10 @@
             "caption": "Handcrafted room mists that turn every corner into a calm ritual.",
             "link": ""
           }
-        },
-        "slide_enjLAC": {
-          "type": "slide",
-          "settings": {
-            "theme_image": "",
-            "image_alt": "",
-            "caption": "",
-            "link": ""
-          }
-        },
-        "stage_camphor": {
-          "type": "slide",
-          "settings": {
-            "cutout": "shopify://shop_images/Untitled_design.png",
-            "theme_image": "",
-            "image_alt": "",
-            "image_width": 40,
-            "caption": "Pure Bhimseni camphor, crystal-clear and temple-ready.",
-            "link": "shopify://products/swick-100-pure-bhimseni-camphor-for-pooja-meditation-diffusers"
-          }
-        },
-        "stage_oil": {
-          "type": "slide",
-          "settings": {
-            "theme_image": "",
-            "image_alt": "",
-            "caption": "Aroma oils distilled from Indian herbs and flowers.",
-            "link": ""
-          }
         }
       },
       "block_order": [
-        "stage_mist",
-        "slide_enjLAC",
-        "stage_camphor",
-        "stage_oil"
+        "stage_mist"
       ],
       "settings": {
         "wordmark_line_1": "Nature.",
