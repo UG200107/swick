@@ -9,276 +9,74 @@
  */
 {
   "sections": {
-    "hero_jVaWmY": {
-      "type": "hero",
-      "disabled": true,
+    "swick_hero_stage": {
+      "type": "swick-hero-stage",
       "blocks": {
-        "text_YLPk4p": {
-          "type": "text",
-          "name": "t:names.heading",
+        "stage_mist": {
+          "type": "slide",
           "settings": {
-            "text": "<p>Browse our latest products</p>",
-            "text_color": "{{ settings.color_palette.background }}",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "theme_image": "swick-hero-room-sprays.webp",
+            "image_alt": "Swick room sprays in French Lavender, Jasmine Bloom, Sandal Wood and Royal Rose on green podiums",
+            "image_width": 920,
+            "image_height": 1236,
+            "caption": "Handcrafted room mists that turn every corner into a calm ritual.",
+            "link": ""
+          }
         },
-        "button_H9gpTf": {
-          "type": "button",
-          "name": "t:names.button",
+        "slide_enjLAC": {
+          "type": "slide",
           "settings": {
-            "label": "Shop all",
-            "link": "shopify://collections/all",
-            "open_in_new_tab": false,
-            "style_class": "button-custom",
-            "custom_button_background": "rgba(0,0,0,0)",
-            "custom_button_text": "{{ settings.color_palette.background }}",
-            "custom_button_border": "{{ settings.color_palette.background }}",
-            "width": "fit-content",
-            "custom_width": 100,
-            "width_mobile": "fit-content",
-            "custom_width_mobile": 100
-          },
-          "blocks": {}
+            "theme_image": "",
+            "image_alt": "",
+            "caption": "",
+            "link": ""
+          }
+        },
+        "stage_camphor": {
+          "type": "slide",
+          "settings": {
+            "cutout": "shopify://shop_images/Untitled_design.png",
+            "theme_image": "",
+            "image_alt": "",
+            "image_width": 40,
+            "caption": "Pure Bhimseni camphor, crystal-clear and temple-ready.",
+            "link": "shopify://products/swick-100-pure-bhimseni-camphor-for-pooja-meditation-diffusers"
+          }
+        },
+        "stage_oil": {
+          "type": "slide",
+          "settings": {
+            "theme_image": "",
+            "image_alt": "",
+            "caption": "Aroma oils distilled from Indian herbs and flowers.",
+            "link": ""
+          }
         }
       },
       "block_order": [
-        "text_YLPk4p",
-        "button_H9gpTf"
+        "stage_mist",
+        "slide_enjLAC",
+        "stage_camphor",
+        "stage_oil"
       ],
-      "name": "t:names.hero",
       "settings": {
-        "media_type_1": "image",
-        "media_type_2": "image",
-        "stack_media_on_mobile": false,
-        "custom_mobile_media": false,
-        "media_type_1_mobile": "image",
-        "media_type_2_mobile": "image",
-        "open_in_new_tab": false,
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "space-between",
-        "vertical_alignment": "flex-end",
-        "align_baseline": true,
-        "horizontal_alignment_flex_direction_column": "center",
-        "vertical_alignment_flex_direction_column": "flex-end",
-        "gap": 24,
-        "section_width": "page-width",
-        "section_height": "medium",
-        "section_height_custom": 50,
-        "background_color": "rgba(0,0,0,0)",
-        "toggle_overlay": true,
-        "overlay_color": "#12121266",
-        "overlay_style": "solid",
-        "gradient_direction": "to bottom",
-        "blurred_reflection": false,
-        "reflection_opacity": 75,
-        "padding-block-start": 100,
-        "padding-block-end": 72
+        "wordmark_line_1": "Nature.",
+        "wordmark_line_2": "Bottled.",
+        "stack_desktop": false,
+        "wordmark_font": "inter_n7",
+        "wordmark_color": "#617246",
+        "background": "#ffffff",
+        "panel_color": "#e6ecdf",
+        "product_size": 80,
+        "mobile_panel_ratio": "4 / 3",
+        "product_size_mobile": 72,
+        "autoplay_seconds": 4,
+        "show_thumbnails": true,
+        "show_arrows": false,
+        "badge_text": "Shop now • Nature bottled •",
+        "badge_label": "Shop now",
+        "badge_link": "shopify://collections/all"
       }
-    },
-    "product_list_fa6P9H": {
-      "type": "product-list",
-      "blocks": {
-        "static-header": {
-          "type": "_product-list-content",
-          "name": "t:names.header",
-          "static": true,
-          "settings": {
-            "content_direction": "row",
-            "vertical_on_mobile": false,
-            "horizontal_alignment": "space-between",
-            "vertical_alignment": "flex-end",
-            "align_baseline": true,
-            "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
-            "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "background_media": "none",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_list_text_YFtzcL": {
-              "type": "_product-list-text",
-              "name": "t:names.collection_title",
-              "settings": {
-                "text": "<h3>{{ closest.collection.title }}</h3>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_list_button_MWeP9V": {
-              "type": "_product-list-button",
-              "name": "t:names.product_list_button",
-              "settings": {
-                "label": "View all",
-                "open_in_new_tab": false,
-                "style_class": "link",
-                "width": "fit-content",
-                "custom_width": 100,
-                "width_mobile": "fit-content",
-                "custom_width_mobile": 100
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_list_text_YFtzcL",
-            "product_list_button_MWeP9V"
-          ]
-        },
-        "static-product-card": {
-          "type": "_product-card",
-          "name": "t:names.product_card",
-          "static": true,
-          "settings": {
-            "product_card_gap": 4,
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_card_gallery_677WP3": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_title_YXxMTj": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "price_JQzVV4": {
-              "type": "price",
-              "name": "t:names.product_price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_card_gallery_677WP3",
-            "product_title_YXxMTj",
-            "price_JQzVV4"
-          ]
-        }
-      },
-      "name": "t:names.product_list",
-      "settings": {
-        "collection": "all",
-        "layout_type": "grid",
-        "carousel_on_mobile": false,
-        "max_products": 8,
-        "columns": 4,
-        "mobile_columns": "2",
-        "mobile_card_size": "60cqw",
-        "columns_gap": 8,
-        "rows_gap": 24,
-        "icons_style": "arrow",
-        "icons_shape": "none",
-        "section_width": "page-width",
-        "horizontal_alignment": "flex-start",
-        "gap": 28,
-        "background_color": "{{ settings.color_palette.background }}",
-        "padding-block-start": 48,
-        "padding-block-end": 48
-      },
-      "disabled": true
     },
     "swick_category_grid": {
       "type": "swick-category-grid",
@@ -286,82 +84,91 @@
         "cat_1": {
           "type": "category",
           "settings": {
+            "collection": "",
             "label": "Blended Camphor",
-            "icon": "leaf",
+            "link": "",
             "badge": "",
-            "link": ""
+            "icon": "leaf"
           }
         },
         "cat_2": {
           "type": "category",
           "settings": {
+            "collection": "",
             "label": "Pure Camphor",
-            "icon": "camphor",
+            "link": "",
             "badge": "",
-            "link": ""
+            "icon": "camphor"
           }
         },
         "cat_3": {
           "type": "category",
           "settings": {
+            "collection": "",
             "label": "Room Sprays",
-            "icon": "spray",
+            "link": "",
             "badge": "",
-            "link": ""
+            "icon": "spray"
           }
         },
         "cat_4": {
           "type": "category",
           "settings": {
+            "collection": "",
             "label": "Linen Sprays",
-            "icon": "linen",
+            "link": "",
             "badge": "",
-            "link": ""
+            "icon": "linen"
           }
         },
         "cat_5": {
           "type": "category",
           "settings": {
+            "collection": "",
             "label": "Temple Fragrance",
-            "icon": "diya",
+            "link": "",
             "badge": "",
-            "link": ""
+            "icon": "diya"
           }
         },
         "cat_6": {
           "type": "category",
           "settings": {
+            "collection": "",
             "label": "Room Fresheners",
-            "icon": "bottle",
+            "link": "",
             "badge": "",
-            "link": ""
+            "icon": "bottle"
           }
         },
         "cat_7": {
           "type": "category",
           "settings": {
+            "collection": "",
             "label": "Aroma Oils",
-            "icon": "oil",
+            "link": "",
             "badge": "",
-            "link": ""
+            "icon": "oil"
           }
         },
         "cat_8": {
           "type": "category",
           "settings": {
+            "collection": "",
             "label": "Discovery Kits",
-            "icon": "gift",
+            "link": "",
             "badge": "Try all",
-            "link": ""
+            "icon": "gift"
           }
         },
         "cat_9": {
           "type": "category",
           "settings": {
+            "collection": "",
             "label": "Bestsellers",
-            "icon": "spray",
+            "link": "",
             "badge": "",
-            "link": ""
+            "icon": "spray"
           }
         }
       },
@@ -391,7 +198,7 @@
         "text_left": "Last few\nbestsellers\nleft",
         "text_right": "Up to 30% off",
         "link": "shopify://collections/all",
-        "background": "#EFEFEF",
+        "background": "#efefef",
         "text_color": "#111111",
         "spacing_top": 16,
         "spacing_bottom": 32
@@ -406,8 +213,8 @@
             "headline": "Monsoon\nfresh",
             "side_text": "Linen\nrituals",
             "link": "",
-            "headline_color": "#FFFFFF",
-            "text_color": "#FFFFFF"
+            "headline_color": "#ffffff",
+            "text_color": "#ffffff"
           }
         },
         "edit_slide_2": {
@@ -416,8 +223,8 @@
             "headline": "Sacred\nsmoke",
             "side_text": "Temple\nedit",
             "link": "",
-            "headline_color": "#E9B98F",
-            "text_color": "#FFFFFF"
+            "headline_color": "#e9b98f",
+            "text_color": "#ffffff"
           }
         }
       },
@@ -486,57 +293,290 @@
         "view_all_label": "View all"
       }
     },
-    "swick_hero_stage": {
-      "type": "swick-hero-stage",
+    "hero_jVaWmY": {
+      "type": "hero",
       "blocks": {
-        "stage_mist": {
-          "type": "slide",
+        "text_YLPk4p": {
+          "type": "text",
+          "name": "t:names.heading",
           "settings": {
-            "caption": "Handcrafted room mists that turn every corner into a calm ritual.",
-            "link": "",
-            "theme_image": "swick-hero-room-sprays.webp",
-            "image_alt": "Swick room sprays in French Lavender, Jasmine Bloom, Sandal Wood and Royal Rose on green podiums",
-            "image_width": 920,
-            "image_height": 1236
-          }
+            "text": "<p>Browse our latest products</p>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "text_color": "{{ settings.color_palette.background }}",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
         },
-        "stage_camphor": {
-          "type": "slide",
+        "button_H9gpTf": {
+          "type": "button",
+          "name": "t:names.button",
           "settings": {
-            "caption": "Pure Bhimseni camphor, crystal-clear and temple-ready.",
-            "link": "shopify://products/swick-100-pure-bhimseni-camphor-for-pooja-meditation-diffusers"
-          }
-        },
-        "stage_oil": {
-          "type": "slide",
-          "settings": {
-            "caption": "Aroma oils distilled from Indian herbs and flowers.",
-            "link": ""
-          }
+            "label": "Shop all",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false,
+            "style_class": "button-custom",
+            "custom_button_background": "rgba(0,0,0,0)",
+            "custom_button_text": "{{ settings.color_palette.background }}",
+            "custom_button_border": "{{ settings.color_palette.background }}",
+            "link_text_color": "",
+            "width": "fit-content",
+            "custom_width": 100,
+            "width_mobile": "fit-content",
+            "custom_width_mobile": 100
+          },
+          "blocks": {}
         }
       },
       "block_order": [
-        "stage_mist",
-        "stage_camphor",
-        "stage_oil"
+        "text_YLPk4p",
+        "button_H9gpTf"
       ],
+      "disabled": true,
+      "name": "t:names.hero",
       "settings": {
-        "wordmark_line_1": "Nature.",
-        "wordmark_line_2": "Bottled.",
-        "stack_desktop": false,
-        "wordmark_font": "inter_n7",
-        "wordmark_color": "#617246",
-        "background": "#FFFFFF",
-        "panel_color": "#E6ECDF",
-        "product_size": 80,
-        "mobile_panel_ratio": "4 / 3",
-        "product_size_mobile": 72,
-        "autoplay_seconds": 4,
-        "show_thumbnails": true,
-        "show_arrows": false,
-        "badge_text": "Shop now • Nature bottled • ",
-        "badge_label": "Shop now",
-        "badge_link": "shopify://collections/all"
+        "media_type_1": "image",
+        "media_type_2": "image",
+        "stack_media_on_mobile": false,
+        "custom_mobile_media": false,
+        "media_type_1_mobile": "image",
+        "media_type_2_mobile": "image",
+        "link": "",
+        "open_in_new_tab": false,
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "space-between",
+        "vertical_alignment": "flex-end",
+        "align_baseline": true,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "flex-end",
+        "gap": 24,
+        "section_width": "page-width",
+        "section_height": "medium",
+        "section_height_custom": 50,
+        "background_color": "rgba(0,0,0,0)",
+        "toggle_overlay": true,
+        "overlay_color": "#12121266",
+        "overlay_style": "solid",
+        "gradient_direction": "to bottom",
+        "blurred_reflection": false,
+        "reflection_opacity": 75,
+        "padding-block-start": 100,
+        "padding-block-end": 72
+      }
+    },
+    "product_list_fa6P9H": {
+      "type": "product-list",
+      "blocks": {
+        "static-header": {
+          "type": "_product-list-content",
+          "name": "t:names.header",
+          "static": true,
+          "settings": {
+            "content_direction": "row",
+            "vertical_on_mobile": false,
+            "horizontal_alignment": "space-between",
+            "vertical_alignment": "flex-end",
+            "align_baseline": true,
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 12,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "custom_height": 100,
+            "background_media": "none",
+            "background_color": "",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_list_text_YFtzcL": {
+              "type": "_product-list-text",
+              "name": "t:names.collection_title",
+              "settings": {
+                "text": "<h3>{{ closest.collection.title }}</h3>",
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "h4",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_list_button_MWeP9V": {
+              "type": "_product-list-button",
+              "name": "t:names.product_list_button",
+              "settings": {
+                "label": "View all",
+                "open_in_new_tab": false,
+                "style_class": "link",
+                "custom_button_background": "{{ settings.color_palette.foreground }}",
+                "custom_button_text": "{{ settings.color_palette.background }}",
+                "custom_button_border": "{{ settings.color_palette.background }}",
+                "link_text_color": "",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_list_text_YFtzcL",
+            "product_list_button_MWeP9V"
+          ]
+        },
+        "static-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 4,
+            "background_color": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_card_gallery_677WP3": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_YXxMTj": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "price_JQzVV4": {
+              "type": "price",
+              "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "text_color": "",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_card_gallery_677WP3",
+            "product_title_YXxMTj",
+            "price_JQzVV4"
+          ]
+        }
+      },
+      "disabled": true,
+      "name": "t:names.product_list",
+      "settings": {
+        "collection": "all",
+        "layout_type": "grid",
+        "carousel_on_mobile": false,
+        "max_products": 8,
+        "columns": 4,
+        "mobile_columns": "2",
+        "mobile_card_size": "60cqw",
+        "columns_gap": 8,
+        "rows_gap": 24,
+        "icons_style": "arrow",
+        "icons_shape": "none",
+        "section_width": "page-width",
+        "horizontal_alignment": "flex-start",
+        "gap": 28,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 48,
+        "padding-block-end": 48
       }
     },
     "swick_hero_slideshow": {
@@ -579,6 +619,7 @@
         "hero_slide_2",
         "hero_slide_3"
       ],
+      "disabled": true,
       "settings": {
         "mobile_ratio": "square",
         "desktop_ratio": "wide",
@@ -586,8 +627,7 @@
         "autoplay_seconds": 5,
         "spacing_bottom": 0,
         "accessibility_label": "Featured collections"
-      },
-      "disabled": true
+      }
     }
   },
   "order": [
