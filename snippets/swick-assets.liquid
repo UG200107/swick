@@ -85,6 +85,12 @@
   }
 
   /* Shared carousel base (swick-slideshow element): used by the slideshow section and the product gallery. */
+  /* Carousels: no double-tap zoom (pinch-zoom still works), so a quick double tap
+     can't zoom the page and set fixed elements drifting. */
+  swick-slideshow {
+    touch-action: manipulation;
+  }
+
   .swick-slideshow {
     position: relative;
     display: block;

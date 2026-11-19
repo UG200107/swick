@@ -280,54 +280,6 @@
       },
       "disabled": true
     },
-    "swick_hero_slideshow": {
-      "type": "swick-slideshow",
-      "blocks": {
-        "hero_slide_1": {
-          "type": "slide",
-          "settings": {
-            "headline": "Pure\nrituals",
-            "side_text": "Nature\nBottled",
-            "link": "",
-            "headline_color": "#FFFFFF",
-            "text_color": "#FFFFFF"
-          }
-        },
-        "hero_slide_2": {
-          "type": "slide",
-          "settings": {
-            "headline": "Temple\nready",
-            "side_text": "Pooja\nessentials",
-            "link": "",
-            "headline_color": "#E9B98F",
-            "text_color": "#FFFFFF"
-          }
-        },
-        "hero_slide_3": {
-          "type": "slide",
-          "settings": {
-            "headline": "Fresh\nlinen",
-            "side_text": "Room &\nlinen sprays",
-            "link": "",
-            "headline_color": "#FFFFFF",
-            "text_color": "#FFFFFF"
-          }
-        }
-      },
-      "block_order": [
-        "hero_slide_1",
-        "hero_slide_2",
-        "hero_slide_3"
-      ],
-      "settings": {
-        "mobile_ratio": "square",
-        "desktop_ratio": "wide",
-        "show_arrows": true,
-        "autoplay_seconds": 5,
-        "spacing_bottom": 0,
-        "accessibility_label": "Featured collections"
-      }
-    },
     "swick_category_grid": {
       "type": "swick-category-grid",
       "blocks": {
@@ -533,10 +485,63 @@
         "products_per_tab": 6,
         "view_all_label": "View all"
       }
+    },
+    "swick_hero_stage": {
+      "type": "swick-hero-stage",
+      "blocks": {
+        "stage_mist": {
+          "type": "slide",
+          "settings": {
+            "caption": "Handcrafted room mists that turn every corner into a calm ritual.",
+            "link": "",
+            "theme_image": "swick-hero-room-sprays.webp",
+            "image_alt": "Swick room sprays in French Lavender, Jasmine Bloom, Sandal Wood and Royal Rose on green podiums",
+            "image_width": 920,
+            "image_height": 1236
+          }
+        },
+        "stage_camphor": {
+          "type": "slide",
+          "settings": {
+            "caption": "Pure Bhimseni camphor, crystal-clear and temple-ready.",
+            "link": "shopify://products/swick-100-pure-bhimseni-camphor-for-pooja-meditation-diffusers"
+          }
+        },
+        "stage_oil": {
+          "type": "slide",
+          "settings": {
+            "caption": "Aroma oils distilled from Indian herbs and flowers.",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "stage_mist",
+        "stage_camphor",
+        "stage_oil"
+      ],
+      "settings": {
+        "wordmark_line_1": "Nature.",
+        "wordmark_line_2": "Bottled.",
+        "stack_desktop": false,
+        "wordmark_font": "inter_n7",
+        "wordmark_color": "#617246",
+        "background": "#FFFFFF",
+        "panel_color": "#E6ECDF",
+        "product_size": 80,
+        "mobile_panel_ratio": "4 / 3",
+        "product_size_mobile": 72,
+        "autoplay_seconds": 4,
+        "show_thumbnails": true,
+        "show_arrows": false,
+        "badge_text": "Shop now • Nature bottled • ",
+        "badge_label": "Shop now",
+        "badge_link": "shopify://collections/all"
+      }
     }
   },
   "order": [
-    "swick_hero_slideshow",
+    "swick_hero_stage",
     "swick_category_grid",
     "swick_promo_banner",
     "swick_editorial",

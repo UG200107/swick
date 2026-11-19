@@ -33,6 +33,11 @@ class SwickSlideshow extends HTMLElement {
       this.raf = window.requestAnimationFrame(() => this.syncIndex());
     };
     this.onUser = () => this.stop();
+    this.onGoto = (event) => {
+      const target = event.target.closest('[data-swick-goto]');
+      if (target && this.contains(target)) this.go(Number(target.dataset.swickGoto), true);
+    };
+    this.addEventListener('click', this.onGoto);
 
     this.prev?.addEventListener('click', this.onPrev);
     this.next?.addEventListener('click', this.onNext);
@@ -41,18 +46,37 @@ class SwickSlideshow extends HTMLElement {
     this.track.addEventListener('touchstart', this.onUser, { passive: true });
     this.addEventListener('focusin', this.onUser);
 
+    // Autoplay only while the carousel is on screen and the page is not being scrolled:
+    // a programmatic smooth scroll during the phone's momentum scroll makes fixed
+    // elements (the bottom nav) jump.
+    this.visible = true;
+    this.lastPageScroll = 0;
+    this.onPageScroll = () => {
+      this.lastPageScroll = Date.now();
+    };
+    window.addEventListener('scroll', this.onPageScroll, { passive: true });
+    if ('IntersectionObserver' in window) {
+      this.io = new IntersectionObserver(([entry]) => {
+        this.visible = entry.isIntersecting && entry.intersectionRatio > 0.5;
+      }, { threshold: [0, 0.5, 1] });
+      this.io.observe(this);
+    }
+
     this.syncIndex();
     this.start();
   }
 
   disconnectedCallback() {
     this.stop();
+    window.removeEventListener('scroll', this.onPageScroll);
+    this.io?.disconnect();
     this.prev?.removeEventListener('click', this.onPrev);
     this.next?.removeEventListener('click', this.onNext);
     this.track?.removeEventListener('scroll', this.onScroll);
     this.track?.removeEventListener('pointerdown', this.onUser);
     this.track?.removeEventListener('touchstart', this.onUser);
     this.removeEventListener('focusin', this.onUser);
+    this.removeEventListener('click', this.onGoto);
   }
 
   go(i, fromUser = false) {
@@ -74,6 +98,12 @@ class SwickSlideshow extends HTMLElement {
       slide.toggleAttribute('inert', !current);
       slide.setAttribute('aria-hidden', String(!current));
     });
+    this.querySelectorAll('[data-swick-goto]').forEach((el) => {
+      if (Number(el.dataset.swickGoto) === this.index) el.setAttribute('aria-current', 'true');
+      else el.removeAttribute('aria-current');
+    });
+    const link = this.slides[this.index]?.dataset.link;
+    if (link) this.querySelectorAll('[data-swick-current-link]').forEach((el) => el.setAttribute('href', link));
     if (this.status) {
       this.status.textContent = (this.status.dataset.template || '')
         .replace('[index]', String(this.index + 1))
@@ -84,12 +114,54 @@ class SwickSlideshow extends HTMLElement {
   start() {
     const seconds = Number(this.dataset.autoplay || 0);
     if (!seconds || reducedMotion()) return;
-    this.timer = window.setInterval(() => this.go(this.index + 1), seconds * 1000);
+    this.timer = window.setInterval(() => {
+      const pageIdle = Date.now() - this.lastPageScroll > 900;
+      if (this.visible && pageIdle && !document.hidden) this.go(this.index + 1);
+    }, seconds * 1000);
   }
 
   stop() {
     if (this.timer) window.clearInterval(this.timer);
     this.timer = null;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Fit text — sizes [data-swick-fit-line] children so the block fills  */
+/* its width: stacked lines share one size; a row fits as a whole.     */
+/* ------------------------------------------------------------------ */
+class SwickFitText extends HTMLElement {
+  connectedCallback() {
+    this.lines = Array.from(this.querySelectorAll('[data-swick-fit-line]'));
+    if (!this.lines.length) return;
+    this.fit = this.fit.bind(this);
+    this.observer = new ResizeObserver(() => {
+      window.cancelAnimationFrame(this.raf);
+      this.raf = window.requestAnimationFrame(this.fit);
+    });
+    this.observer.observe(this);
+    this.fit();
+    document.fonts?.ready.then(this.fit);
+  }
+
+  disconnectedCallback() {
+    this.observer?.disconnect();
+  }
+
+  fit() {
+    const style = getComputedStyle(this);
+    const available = this.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    if (available <= 0) return;
+    const probe = 100;
+    this.lines.forEach((line) => (line.style.fontSize = `${probe}px`));
+    const row = style.flexDirection === 'row';
+    const widths = this.lines.map((line) => {
+      const ls = getComputedStyle(line);
+      return line.getBoundingClientRect().width + parseFloat(ls.marginLeft) + parseFloat(ls.marginRight);
+    });
+    const needed = row ? widths.reduce((a, b) => a + b, 0) : Math.max(...widths);
+    const size = Math.max(12, (probe * available) / needed) * 0.985;
+    this.lines.forEach((line) => (line.style.fontSize = `${size.toFixed(2)}px`));
   }
 }
 
@@ -741,6 +813,7 @@ const define = (name, ctor) => {
 };
 
 define('swick-slideshow', SwickSlideshow);
+define('swick-fit-text', SwickFitText);
 define('swick-tabs', SwickTabs);
 define('swick-wishlist', SwickWishlist);
 define('swick-quick-add', SwickQuickAdd);

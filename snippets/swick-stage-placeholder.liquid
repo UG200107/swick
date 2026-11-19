@@ -1,0 +1,59 @@
+{%- doc -%}
+  Stand-in product cut-out for the hero stage until real transparent images are uploaded:
+  a glass bottle (tone 0), a camphor jar (tone 1) or an oil dropper bottle (tone 2).
+
+  @param {number} [tone] - 0, 1 or 2.
+  @param {string} [class] - Class for the svg element.
+  @param {string} [uid] - Suffix that keeps gradient IDs unique when rendered more than once.
+
+  @example
+  {% render 'swick-stage-placeholder', tone: 0, class: 'swick-stage__cutout' %}
+{%- enddoc -%}
+
+{%- assign ph_id = 'swick-ph-' | append: tone | append: '-' | append: uid -%}
+<svg class="{{ class }}" viewBox="0 0 240 420" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMax meet">
+  <defs>
+    <linearGradient id="{{ ph_id }}-glass" x1="0" x2="1" y1="0" y2="0">
+      {%- case tone -%}
+        {%- when 1 -%}
+          <stop offset="0" stop-color="#d9e4ea"/><stop offset=".45" stop-color="#f6fafc"/><stop offset="1" stop-color="#c3d2da"/>
+        {%- when 2 -%}
+          <stop offset="0" stop-color="#2d4a3b"/><stop offset=".45" stop-color="#4f7a62"/><stop offset="1" stop-color="#1f3a2d"/>
+        {%- else -%}
+          <stop offset="0" stop-color="#8a4a1f"/><stop offset=".45" stop-color="#c98a52"/><stop offset="1" stop-color="#6e3714"/>
+      {%- endcase -%}
+    </linearGradient>
+    <linearGradient id="{{ ph_id }}-cap" x1="0" x2="1">
+      <stop offset="0" stop-color="#1a1a1a"/><stop offset=".5" stop-color="#4a4a4a"/><stop offset="1" stop-color="#151515"/>
+    </linearGradient>
+  </defs>
+  {%- case tone -%}
+    {%- when 1 -%}
+      {%- comment -%} Wide camphor jar {%- endcomment -%}
+      <rect x="36" y="150" width="168" height="34" rx="8" fill="url(#{{ ph_id }}-cap)"/>
+      <rect x="28" y="180" width="184" height="230" rx="26" fill="url(#{{ ph_id }}-glass)"/>
+      <rect x="44" y="240" width="152" height="96" rx="6" fill="#faf8f5" opacity=".92"/>
+      <text x="120" y="282" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#2b2b2b">Swick</text>
+      <text x="120" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" letter-spacing="2" fill="#6b6b6b">BHIMSENI CAMPHOR</text>
+      <path d="M46 196v196" stroke="#fff" stroke-opacity=".6" stroke-width="6" stroke-linecap="round"/>
+    {%- when 2 -%}
+      {%- comment -%} Dropper oil bottle {%- endcomment -%}
+      <rect x="100" y="40" width="40" height="70" rx="18" fill="url(#{{ ph_id }}-cap)"/>
+      <rect x="92" y="104" width="56" height="44" rx="6" fill="url(#{{ ph_id }}-cap)"/>
+      <path d="M78 160c0-10 8-16 18-16h48c10 0 18 6 18 16v236c0 8-6 14-14 14H92c-8 0-14-6-14-14Z" fill="url(#{{ ph_id }}-glass)"/>
+      <rect x="88" y="236" width="64" height="104" rx="4" fill="#faf8f5" opacity=".92"/>
+      <text x="120" y="282" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#2b2b2b">Swick</text>
+      <text x="120" y="304" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" letter-spacing="1.5" fill="#6b6b6b">AROMA OIL</text>
+      <path d="M90 170v220" stroke="#fff" stroke-opacity=".35" stroke-width="5" stroke-linecap="round"/>
+    {%- else -%}
+      {%- comment -%} Room spray bottle {%- endcomment -%}
+      <rect x="104" y="18" width="32" height="20" rx="4" fill="url(#{{ ph_id }}-cap)"/>
+      <path d="M96 38h48v34H96z" fill="url(#{{ ph_id }}-cap)"/>
+      <rect x="108" y="72" width="24" height="22" fill="#2a2a2a"/>
+      <path d="M60 128c0-20 16-34 36-34h48c20 0 36 14 36 34v268c0 8-6 14-14 14H74c-8 0-14-6-14-14Z" fill="url(#{{ ph_id }}-glass)"/>
+      <rect x="78" y="220" width="84" height="120" rx="4" fill="#faf8f5" opacity=".94"/>
+      <text x="120" y="270" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#2b2b2b">Swick</text>
+      <text x="120" y="294" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" letter-spacing="1.5" fill="#6b6b6b">ROOM MIST</text>
+      <path d="M74 140v250" stroke="#fff" stroke-opacity=".4" stroke-width="6" stroke-linecap="round"/>
+  {%- endcase -%}
+</svg>

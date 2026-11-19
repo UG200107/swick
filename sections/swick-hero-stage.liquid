@@ -1,0 +1,802 @@
+{%- comment -%}
+  Swick — "stage" hero.
+  Three layers:
+    1. A static, width-filling slogan ("NATURE. BOTTLED.") at the back.
+    2. A rounded scene panel below it (optional static room photo).
+    3. A swipeable carousel of transparent product cut-outs in front, tall enough to rise
+       over the lower half of the slogan as they slide.
+  Plus a glass caption, thumbnail buttons and a rotating circular "Shop now" badge that
+  follows the active slide's link.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign slide_count = section.blocks.size
+  assign above_fold = false
+  if section.index and section.index <= 2
+    assign above_fold = true
+  endif
+
+  assign wm_font = s.wordmark_font
+  assign wm_heavy = wm_font | font_modify: 'weight', '900'
+  if wm_heavy
+    assign wm_font = wm_heavy
+  endif
+
+  assign first_link = section.blocks.first.settings.link | default: s.badge_link | default: routes.all_products_collection_url
+-%}
+
+{% render 'swick-assets' %}
+
+{% style %}
+  {{ wm_font | font_face: font_display: 'swap' }}
+  #shopify-section-{{ section.id }} .swick-stage {
+    --swick-stage-bg: {{ s.background }};
+    --swick-stage-ink: {{ s.wordmark_color }};
+    --swick-stage-panel: {{ s.panel_color }};
+    --swick-stage-font: {{ wm_font.family }}, {{ wm_font.fallback_families }};
+    --swick-stage-weight: {{ wm_font.weight }};
+    --swick-stage-product: {{ s.product_size }}%;
+    --swick-stage-product-m: {{ s.product_size_mobile }}%;
+    --swick-stage-panel-ratio-m: {{ s.mobile_panel_ratio }};
+  }
+{% endstyle %}
+
+<swick-slideshow
+  class="swick-stage{% if s.stack_desktop %} swick-stage--stack-desktop{% endif %}"
+  data-autoplay="{{ s.autoplay_seconds }}"
+  role="region"
+  aria-roledescription="carousel"
+  aria-label="{{ s.wordmark_line_1 | append: ' ' | append: s.wordmark_line_2 | strip | escape }}"
+>
+  <div class="swick-stage__frame">
+    {%- comment -%} 1. Slogan (decorative; the region label carries it for screen readers) {%- endcomment -%}
+    <swick-fit-text class="swick-stage__wordmark" aria-hidden="true">
+      <span class="swick-stage__line" data-swick-fit-line>{{ s.wordmark_line_1 | escape }}</span>
+      {%- if s.wordmark_line_2 != blank -%}
+        <span class="swick-stage__line" data-swick-fit-line>{{ s.wordmark_line_2 | escape }}</span>
+      {%- endif -%}
+    </swick-fit-text>
+
+    {%- comment -%} 2. Scene panel {%- endcomment -%}
+    <div class="swick-stage__panel" aria-hidden="true">
+      {%- if s.panel_image != blank -%}
+        {{
+          s.panel_image
+          | image_url: width: 2400
+          | image_tag:
+            widths: '600, 900, 1200, 1800, 2400',
+            sizes: '100vw',
+            loading: 'eager',
+            alt: '',
+            class: 'swick-stage__panel-img'
+        }}
+      {%- endif -%}
+      <span class="swick-stage__floor"></span>
+    </div>
+
+    {%- comment -%} 3. Product cut-outs {%- endcomment -%}
+    <ul class="swick-stage__track" data-swick-track role="list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+          assign slide_link = b.link | default: s.badge_link | default: routes.all_products_collection_url
+          assign tone = forloop.index0 | modulo: 3
+        -%}
+        <li
+          class="swick-stage__slide"
+          data-swick-slide
+          data-link="{{ slide_link }}"
+          aria-roledescription="slide"
+          aria-label="{{ forloop.index }} / {{ slide_count }}"
+          {{ block.shopify_attributes }}
+        >
+          <a href="{{ slide_link }}" class="swick-stage__product" tabindex="-1">
+            <span class="swick-stage__shadow" aria-hidden="true"></span>
+            {%- if b.cutout != blank -%}
+              {%- liquid
+                assign img_loading = 'lazy'
+                assign img_priority = 'auto'
+                if above_fold and forloop.first
+                  assign img_loading = 'eager'
+                  assign img_priority = 'high'
+                endif
+              -%}
+              {{
+                b.cutout
+                | image_url: width: 1400
+                | image_tag:
+                  widths: '400, 600, 800, 1000, 1400',
+                  sizes: '(min-width: 750px) 45vw, 85vw',
+                  loading: img_loading,
+                  fetchpriority: img_priority,
+                  alt: b.cutout.alt,
+                  class: 'swick-stage__cutout'
+              }}
+            {%- elsif b.theme_image != blank -%}
+              {%- liquid
+                assign asset_loading = 'lazy'
+                assign asset_priority = 'auto'
+                if above_fold and forloop.first
+                  assign asset_loading = 'eager'
+                  assign asset_priority = 'high'
+                endif
+              -%}
+              <img
+                src="{{ b.theme_image | asset_url }}"
+                alt="{{ b.image_alt | escape }}"
+                width="{{ b.image_width | default: 1000 }}"
+                height="{{ b.image_height | default: 1000 }}"
+                loading="{{ asset_loading }}"
+                fetchpriority="{{ asset_priority }}"
+                decoding="async"
+                class="swick-stage__cutout"
+              >
+            {%- else -%}
+              {%- render 'swick-stage-placeholder', tone: tone, uid: block.id, class: 'swick-stage__cutout swick-stage__cutout--ph' -%}
+            {%- endif -%}
+          </a>
+          {%- if b.caption != blank -%}
+            <p class="swick-stage__caption">{{ b.caption | escape | newline_to_br }}</p>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- comment -%} UI layer over the panel {%- endcomment -%}
+    <div class="swick-stage__ui">
+      {%- if s.show_thumbnails and slide_count > 1 -%}
+        <div class="swick-stage__thumbs">
+          {%- for block in section.blocks -%}
+            <button
+              type="button"
+              class="swick-stage__thumb"
+              data-swick-goto="{{ forloop.index0 }}"
+              aria-label="{{ 'accessibility.slide_status' | t: index: forloop.index, length: slide_count | escape }}"
+              {% if forloop.first %}
+                aria-current="true"
+              {% endif %}
+            >
+              {%- if block.settings.cutout != blank -%}
+                {{
+                  block.settings.cutout
+                  | image_url: width: 160
+                  | image_tag: widths: '80, 160', sizes: '56px', loading: 'lazy', alt: '', class: 'swick-stage__thumb-img'
+                }}
+              {%- elsif block.settings.theme_image != blank -%}
+                <img src="{{ block.settings.theme_image | asset_url }}" alt="" width="{{ block.settings.image_width | default: 1000 }}" height="{{ block.settings.image_height | default: 1000 }}" loading="lazy" decoding="async" class="swick-stage__thumb-img">
+              {%- else -%}
+                {%- assign t = forloop.index0 | modulo: 3 -%}
+                {%- assign thumb_uid = 'thumb-' | append: block.id -%}
+                {%- render 'swick-stage-placeholder', tone: t, uid: thumb_uid, class: 'swick-stage__thumb-img' -%}
+              {%- endif -%}
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if s.badge_text != blank -%}
+        <a href="{{ first_link }}" class="swick-stage__badge" data-swick-current-link aria-label="{{ s.badge_label | escape }}">
+          <svg class="swick-stage__badge-ring" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+            <defs>
+              <path id="SwickBadgePath-{{ section.id }}" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/>
+            </defs>
+            <text>
+              <textPath href="#SwickBadgePath-{{ section.id }}" textLength="462" lengthAdjust="spacing">{{ s.badge_text | escape }}</textPath>
+            </text>
+          </svg>
+          <span class="swick-stage__badge-core" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </span>
+        </a>
+      {%- endif -%}
+
+      {%- if s.show_arrows and slide_count > 1 -%}
+        <button type="button" class="swick-stage__arrow swick-stage__arrow--prev" data-swick-prev aria-label="{{ 'accessibility.slideshow_previous' | t | escape }}">
+          {%- render 'swick-icon', icon: 'chevron-left' -%}
+        </button>
+        <button type="button" class="swick-stage__arrow swick-stage__arrow--next" data-swick-next aria-label="{{ 'accessibility.slideshow_next' | t | escape }}">
+          {%- render 'swick-icon', icon: 'chevron-right' -%}
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if slide_count > 1 -%}
+    <p
+      class="swick-visually-hidden"
+      aria-live="polite"
+      data-swick-status
+      data-template="{{ 'accessibility.slide_status' | t: index: '[index]', length: '[length]' | escape }}"
+    ></p>
+  {%- endif -%}
+</swick-slideshow>
+
+{% stylesheet %}
+  .swick-stage {
+    display: block;
+    padding: 10px 12px 14px;
+    background-color: var(--swick-stage-bg, #fff);
+  }
+
+  /*
+    One grid cell stack: slogan (row 1) and panel (row 2) in normal flow,
+    the cut-out track and the UI layer spanning on top of them.
+  */
+  .swick-stage__frame {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+  }
+
+  /* ---------- 1. Slogan ---------- */
+  .swick-stage__wordmark {
+    grid-area: 1 / 1 / 2 / 2;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 6px 4px;
+    color: var(--swick-stage-ink, #617246);
+    font-family: var(--swick-stage-font, var(--font-heading--family));
+    font-weight: var(--swick-stage-weight, 900);
+    line-height: 0.86;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .swick-stage__line {
+    display: block;
+    white-space: nowrap;
+    /* Fallback until swick-fit-text sizes it. */
+    font-size: 19vw;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-stage:not(.swick-stage--stack-desktop) .swick-stage__wordmark {
+      flex-direction: row;
+      justify-content: center;
+    }
+
+    .swick-stage:not(.swick-stage--stack-desktop) .swick-stage__line + .swick-stage__line {
+      margin-inline-start: 0.16em;
+    }
+
+    .swick-stage:not(.swick-stage--stack-desktop) .swick-stage__line {
+      font-size: 10vw;
+    }
+  }
+
+  /* ---------- 2. Panel ---------- */
+  .swick-stage__panel {
+    grid-area: 2 / 1 / 3 / 2;
+    position: relative;
+    z-index: 0;
+    aspect-ratio: var(--swick-stage-panel-ratio-m, 4 / 3);
+    margin-block-start: 6px;
+    overflow: hidden;
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 70% at 50% 100%, rgb(0 0 0 / 0.1) 0%, transparent 60%),
+      linear-gradient(180deg, color-mix(in srgb, var(--swick-stage-panel, #e6ecdf) 85%, #fff) 0%, var(--swick-stage-panel, #e6ecdf) 100%);
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-stage {
+      padding: 16px 32px 28px;
+    }
+
+    /* Keep the whole hero inside the first screen on desktop. */
+    .swick-stage__panel {
+      aspect-ratio: auto;
+      height: clamp(360px, calc(100svh - 16vw - 160px), 620px);
+      border-radius: 28px;
+    }
+  }
+
+  .swick-stage__panel-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .swick-stage__floor {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: 28%;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.12), transparent);
+  }
+
+  /* ---------- 3. Cut-out track ---------- */
+  /* Absolutely positioned so the tall cut-outs never stretch the grid rows. */
+  .swick-stage__track {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .swick-stage__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .swick-stage__slide {
+    position: relative;
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .swick-stage__product {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: var(--swick-stage-product-m, 72%);
+    width: 100%;
+    margin-block-end: 6%;
+  }
+
+  .swick-stage__cutout {
+    position: relative;
+    z-index: 1;
+    display: block;
+    max-width: 88%;
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    object-position: bottom center;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+  }
+
+  .swick-stage__cutout--ph {
+    aspect-ratio: 240 / 420;
+  }
+
+  /* Soft contact shadow on the floor. */
+  .swick-stage__shadow {
+    position: absolute;
+    inset-block-end: -2%;
+    inset-inline-start: 50%;
+    width: 60%;
+    height: 8%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.28), transparent);
+  }
+
+  /* Slides that are not active ease back slightly, so the swipe feels like objects passing. */
+  .swick-stage__slide[aria-hidden='true'] .swick-stage__cutout {
+    transform: scale(0.92);
+    opacity: 0.85;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .swick-stage__cutout {
+      transition: none;
+    }
+  }
+
+  .swick-stage__caption {
+    position: absolute;
+    inset-inline-start: 4%;
+    inset-block-end: 40%;
+    z-index: 2;
+    max-width: 46%;
+    margin: 0;
+    padding: 10px 12px;
+    border: 1px solid rgb(255 255 255 / 0.5);
+    border-radius: 12px;
+    background-color: rgb(255 255 255 / 0.28);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    font-family: var(--font-body--family);
+    font-size: 12px;
+    line-height: 1.4;
+    color: #1a1a1a;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-stage__caption {
+      inset-inline-start: 9%;
+      inset-block-end: 34%;
+      max-width: 260px;
+      padding: 12px 16px;
+      font-size: 14px;
+    }
+
+    .swick-stage__cutout {
+      max-width: 52%;
+    }
+
+    .swick-stage__product {
+      height: var(--swick-stage-product, 80%);
+      margin-block-end: 7%;
+    }
+  }
+
+  /* ---------- UI layer ---------- */
+  .swick-stage__ui {
+    grid-area: 2 / 1 / 3 / 2;
+    position: relative;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .swick-stage__ui > * {
+    pointer-events: auto;
+  }
+
+  .swick-stage__thumbs {
+    position: absolute;
+    inset-inline-start: 12px;
+    inset-block-end: 12px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .swick-stage__thumb {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 4px;
+    border: 1px solid rgb(255 255 255 / 0.55);
+    border-radius: 8px;
+    background-color: rgb(255 255 255 / 0.3);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .swick-stage__thumb[aria-current='true'] {
+    border-color: var(--swick-stage-ink, #617246);
+    background-color: rgb(255 255 255 / 0.7);
+  }
+
+  .swick-stage__thumb-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-stage__thumbs {
+      inset-inline-start: 28px;
+      inset-block-end: 24px;
+      gap: 8px;
+    }
+
+    .swick-stage__thumb {
+      width: 56px;
+      height: 52px;
+    }
+  }
+
+  .swick-stage__badge {
+    position: absolute;
+    inset-inline-end: -4px;
+    inset-block-end: -6px;
+    display: grid;
+    place-items: center;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background-color: var(--swick-stage-ink, #617246);
+    box-shadow: 0 0 0 6px var(--swick-stage-bg, #fff);
+    color: var(--swick-stage-bg, #fff);
+    text-decoration: none;
+  }
+
+  .swick-stage__badge-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    font-family: var(--font-body--family);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    fill: currentColor;
+    animation: swick-spin 14s linear infinite;
+  }
+
+  .swick-stage__badge-core {
+    display: grid;
+    place-items: center;
+    width: 46%;
+    height: 46%;
+    border-radius: 50%;
+    background-color: var(--swick-stage-bg, #fff);
+    color: var(--swick-stage-ink, #617246);
+  }
+
+  .swick-stage__badge-core svg {
+    width: 50%;
+    height: 50%;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-stage__badge {
+      inset-inline-end: -10px;
+      inset-block-end: -12px;
+      width: 156px;
+      height: 156px;
+      box-shadow: 0 0 0 10px var(--swick-stage-bg, #fff);
+    }
+  }
+
+  @keyframes swick-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .swick-stage__badge-ring {
+      animation: none;
+    }
+  }
+
+  .swick-stage__badge:focus-visible,
+  .swick-stage__thumb:focus-visible,
+  .swick-stage__arrow:focus-visible {
+    outline: 2px solid var(--swick-stage-ink, #617246);
+    outline-offset: 3px;
+  }
+
+  .swick-stage__arrow {
+    position: absolute;
+    inset-block-start: 50%;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-block-start: -22px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--swick-stage-ink, #617246);
+    cursor: pointer;
+  }
+
+  .swick-stage__arrow svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .swick-stage__arrow--prev { inset-inline-start: 2px; }
+  .swick-stage__arrow--next { inset-inline-end: 2px; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick hero stage",
+  "tag": "section",
+  "class": "swick-stage-section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Slogan"
+    },
+    {
+      "type": "text",
+      "id": "wordmark_line_1",
+      "label": "First word",
+      "default": "Nature."
+    },
+    {
+      "type": "text",
+      "id": "wordmark_line_2",
+      "label": "Second word",
+      "default": "Bottled."
+    },
+    {
+      "type": "checkbox",
+      "id": "stack_desktop",
+      "label": "Stack the words on desktop too",
+      "info": "On phones the words always stack.",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "wordmark_font",
+      "label": "Slogan font",
+      "info": "A chunky display face works best, e.g. Alfa Slab One, Abril Fatface or Bricolage Grotesque.",
+      "default": "inter_n7"
+    },
+    {
+      "type": "color",
+      "id": "wordmark_color",
+      "label": "Slogan and badge color",
+      "default": "#617246"
+    },
+    {
+      "type": "header",
+      "content": "Stage"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "panel_color",
+      "label": "Panel color",
+      "info": "Shown when there is no panel image.",
+      "default": "#E6ECDF"
+    },
+    {
+      "type": "image_picker",
+      "id": "panel_image",
+      "label": "Panel image",
+      "info": "A room or altar scene. It stays still while the products slide. Phones 1:1, desktop 16:7."
+    },
+    {
+      "type": "range",
+      "id": "product_size",
+      "label": "Product height (desktop)",
+      "info": "Higher values let the product rise further over the slogan.",
+      "min": 60,
+      "max": 100,
+      "step": 2,
+      "unit": "%",
+      "default": 80
+    },
+    {
+      "type": "select",
+      "id": "mobile_panel_ratio",
+      "label": "Panel shape on phones",
+      "info": "Wider shapes keep the hero compact when several bottles are in one image.",
+      "options": [
+        { "value": "3 / 2", "label": "Wide (3:2)" },
+        { "value": "4 / 3", "label": "Medium (4:3)" },
+        { "value": "5 / 4", "label": "Tall (5:4)" },
+        { "value": "1 / 1", "label": "Square (1:1)" }
+      ],
+      "default": "4 / 3"
+    },
+    {
+      "type": "range",
+      "id": "product_size_mobile",
+      "label": "Product height (phones)",
+      "min": 50,
+      "max": 100,
+      "step": 2,
+      "unit": "%",
+      "default": 72
+    },
+    {
+      "type": "header",
+      "content": "Carousel"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_seconds",
+      "label": "Auto-rotate every",
+      "info": "0 turns it off. It stops as soon as a shopper swipes or taps.",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbnails",
+      "label": "Show thumbnails",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Badge"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Rotating text",
+      "info": "Repeat it to fill the circle. Leave blank to hide the badge.",
+      "default": "Shop now • Nature bottled • "
+    },
+    {
+      "type": "text",
+      "id": "badge_label",
+      "label": "Screen reader label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "badge_link",
+      "label": "Fallback link",
+      "info": "The badge follows the active slide's link; this is used when a slide has none."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Product slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "cutout",
+          "label": "Product cut-out",
+          "info": "Transparent PNG or WebP, tall crop, product standing on the bottom edge. 1400px tall or more."
+        },
+        {
+          "type": "text",
+          "id": "theme_image",
+          "label": "Or theme asset file",
+          "info": "File name of an image in the theme's assets folder, e.g. swick-hero-room-sprays.webp. Used when no cut-out is picked above."
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "Image description",
+          "info": "For screen readers, when using a theme asset file."
+        },
+        {
+          "type": "number",
+          "id": "image_width",
+          "label": "Asset image width (px)"
+        },
+        {
+          "type": "number",
+          "id": "image_height",
+          "label": "Asset image height (px)"
+        },
+        {
+          "type": "textarea",
+          "id": "caption",
+          "label": "Caption",
+          "info": "Short line in the glass box."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick hero stage",
+      "blocks": [
+        { "type": "slide", "settings": { "caption": "Handcrafted room mists that turn every corner into a calm ritual." } },
+        { "type": "slide", "settings": { "caption": "Pure Bhimseni camphor, crystal-clear and temple-ready." } },
+        { "type": "slide", "settings": { "caption": "Aroma oils distilled from Indian herbs and flowers." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

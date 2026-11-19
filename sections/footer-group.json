@@ -203,15 +203,6 @@
             "link": ""
           }
         },
-        "nav_menu": {
-          "type": "item",
-          "settings": {
-            "label": "Menu",
-            "icon": "menu",
-            "action": "menu",
-            "link": ""
-          }
-        },
         "nav_new": {
           "type": "item",
           "settings": {
@@ -242,7 +233,6 @@
       },
       "block_order": [
         "nav_home",
-        "nav_menu",
         "nav_new",
         "nav_bag",
         "nav_offers"

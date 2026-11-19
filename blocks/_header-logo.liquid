@@ -57,14 +57,31 @@
     {% endif %}
     data-testid="header-logo"
   >
-    {% render 'image',
-      image: settings.logo,
-      class: 'header-logo__image',
-      height: settings.logo_height,
-      alt_text_fallback: alt_text_fallback,
-      text_fallback: shop.name,
-      style: logo_style
-    %}
+    {%- comment -%} Swick: use the bundled logo asset until a logo is uploaded in Theme settings. {%- endcomment -%}
+    {% if settings.logo == blank %}
+      {% liquid
+        assign swick_logo_ratio = 0.7028
+        assign swick_logo_w = settings.logo_height | times: swick_logo_ratio | ceil
+        assign swick_logo_w_mobile = settings.logo_height_mobile | times: swick_logo_ratio | ceil
+      %}
+      <img
+        src="{{ 'swick-logo.png' | asset_url }}"
+        alt="{{ alt_text_fallback | escape }}"
+        width="253"
+        height="360"
+        class="header-logo__image"
+        style="--header-logo-image-width: {{ swick_logo_w }}px; --header-logo-image-width-mobile: {{ swick_logo_w_mobile }}px; --header-logo-image-height: {{ settings.logo_height }}px; --header-logo-image-height-mobile: {{ settings.logo_height_mobile }}px;"
+      >
+    {% else %}
+      {% render 'image',
+        image: settings.logo,
+        class: 'header-logo__image',
+        height: settings.logo_height,
+        alt_text_fallback: alt_text_fallback,
+        text_fallback: shop.name,
+        style: logo_style
+      %}
+    {% endif %}
   </span>
 
   {% if use_inverse_logo %}
