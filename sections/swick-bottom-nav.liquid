@@ -1,0 +1,265 @@
+{%- comment -%}
+  Swick — floating app-style bottom navigation (mobile only, Snitch-style).
+  A frosted pill of items plus an optional detached last item. Items can be plain links or
+  open the theme's menu drawer, cart drawer or search modal. Lives in the footer group so it
+  shows on every page.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign main_count = section.blocks.size
+  assign has_detached = false
+  if s.detach_last and section.blocks.size > 2
+    assign has_detached = true
+    assign main_count = section.blocks.size | minus: 1
+  endif
+-%}
+
+{% render 'swick-assets' %}
+
+<swick-bottom-nav class="swick-bnav{% if s.hide_header_cart %} swick-bnav--hide-header-cart{% endif %}">
+  <nav class="swick-bnav__bar" aria-label="{{ s.accessibility_label | escape }}">
+    <ul class="swick-bnav__group" role="list">
+      {%- for block in section.blocks limit: main_count -%}
+        {%- render 'swick-bottom-nav-item', block: block -%}
+      {%- endfor -%}
+    </ul>
+    {%- if has_detached -%}
+      <ul class="swick-bnav__group swick-bnav__group--detached" role="list">
+        {%- render 'swick-bottom-nav-item', block: section.blocks.last -%}
+      </ul>
+    {%- endif -%}
+  </nav>
+</swick-bottom-nav>
+
+{% stylesheet %}
+  .swick-bnav {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .swick-bnav {
+      position: fixed;
+      inset-inline: 0;
+      inset-block-end: 0;
+      z-index: 20;
+      display: block;
+      padding: 0 12px calc(10px + env(safe-area-inset-bottom));
+      pointer-events: none;
+    }
+
+    body:has(.swick-bnav) {
+      padding-block-end: calc(88px + env(safe-area-inset-bottom));
+    }
+
+    /* Step aside while the theme's menu drawer is open. */
+    body:has(header-drawer details[open]) .swick-bnav {
+      display: none;
+    }
+
+    body:has(.swick-bnav--hide-header-cart) [data-testid='cart-drawer-trigger'],
+    body:has(.swick-bnav--hide-header-cart) .header-actions__action.action__cart {
+      display: none;
+    }
+  }
+
+  .swick-bnav__bar {
+    display: flex;
+    gap: 8px;
+    max-width: 520px;
+    margin-inline: auto;
+  }
+
+  .swick-bnav__group {
+    display: flex;
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    border: 1px solid rgb(0 0 0 / 0.06);
+    border-radius: 14px;
+    background-color: rgb(255 255 255 / 0.82);
+    box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+    pointer-events: auto;
+  }
+
+  .swick-bnav__group--detached {
+    flex: 0 0 auto;
+  }
+
+  .swick-bnav__cell {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .swick-bnav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 52px;
+    min-height: 52px;
+    padding: 4px 6px;
+    border-radius: 10px;
+    color: var(--swick-ink, #111);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color var(--animation-speed-medium, 0.15s) ease;
+  }
+
+  .swick-bnav__item.is-active {
+    background-color: var(--swick-accent-soft, #f6e9df);
+    color: var(--swick-accent, #c27d48);
+  }
+
+  .swick-bnav__item.is-active .swick-bnav__label {
+    color: var(--swick-ink, #111);
+  }
+
+  .swick-bnav__item:focus-visible {
+    outline: 2px solid var(--swick-ink, #111);
+    outline-offset: -2px;
+  }
+
+  .swick-bnav__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+  }
+
+  .swick-bnav__icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .swick-bnav__count {
+    position: absolute;
+    inset-block-start: -4px;
+    inset-inline-end: -8px;
+    min-width: 16px;
+    height: 16px;
+    padding-inline: 4px;
+    box-sizing: border-box;
+    border-radius: 999px;
+    background-color: var(--swick-accent, #c27d48);
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+  }
+
+  .swick-bnav__count[hidden] {
+    display: none;
+  }
+
+  .swick-bnav__label {
+    font-family: var(--font-body--family);
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick bottom nav",
+  "tag": "div",
+  "class": "swick-bnav-section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows on phones only (under 750px)."
+    },
+    {
+      "type": "checkbox",
+      "id": "detach_last",
+      "label": "Show last item as a separate pill",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_header_cart",
+      "label": "Hide the header cart icon on phones",
+      "info": "The bag in this bar replaces it.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "accessibility_label",
+      "label": "Screen reader label",
+      "default": "Quick navigation"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Home"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "home", "label": "Home" },
+            { "value": "menu", "label": "Menu" },
+            { "value": "new", "label": "New tag" },
+            { "value": "bag", "label": "Bag" },
+            { "value": "store", "label": "Store" },
+            { "value": "search", "label": "Search" },
+            { "value": "user", "label": "Account" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "leaf", "label": "Leaf" }
+          ],
+          "default": "home"
+        },
+        {
+          "type": "select",
+          "id": "action",
+          "label": "On tap",
+          "options": [
+            { "value": "link", "label": "Go to link" },
+            { "value": "menu", "label": "Open menu drawer" },
+            { "value": "cart", "label": "Open cart" },
+            { "value": "search", "label": "Open search" }
+          ],
+          "default": "link"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Used for 'Go to link', and as the no-JavaScript fallback for the menu."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick bottom nav",
+      "blocks": [
+        { "type": "item", "settings": { "label": "Home", "icon": "home", "action": "link" } },
+        { "type": "item", "settings": { "label": "Menu", "icon": "menu", "action": "menu" } },
+        { "type": "item", "settings": { "label": "New", "icon": "new", "action": "link", "link": "/collections/all" } },
+        { "type": "item", "settings": { "label": "Bag", "icon": "bag", "action": "cart" } },
+        { "type": "item", "settings": { "label": "Offers", "icon": "gift", "action": "link", "link": "/collections/all" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

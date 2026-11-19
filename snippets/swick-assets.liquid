@@ -1,0 +1,151 @@
+{%- doc -%}
+  Shared Swick tokens, the light (300) weight of the body font used for Snitch-style
+  "light + bold" uppercase headings, and the swick.js module.
+  Safe to render from several sections: duplicate @font-face rules and identical
+  module script URLs are de-duplicated by the browser.
+
+  @example
+  {% render 'swick-assets' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign swick_light = settings.type_body_font | font_modify: 'weight', '300'
+-%}
+{%- if swick_light -%}
+  {% style %}
+    {{ swick_light | font_face: font_display: 'swap' }}
+  {% endstyle %}
+{%- endif -%}
+<script type="module" src="{{ 'swick.js' | asset_url }}"></script>
+
+{% stylesheet %}
+  :root {
+    --swick-ink: #111111;
+    --swick-ink-soft: #3a3a3a;
+    --swick-muted: #6b6b6b;
+    --swick-line: #e4e4e4;
+    --swick-soft: #f2f2f2;
+    --swick-surface: #ffffff;
+    --swick-accent: #c27d48;
+    --swick-accent-soft: #f6e9df;
+    --swick-gutter: 16px;
+  }
+
+  /* Two-line "SHOP BY / CATEGORY" heading: light line over bold line. */
+  .swick-title {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 30px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--swick-ink);
+  }
+
+  .swick-title__light {
+    display: block;
+    font-weight: 300;
+  }
+
+  .swick-title__bold {
+    display: block;
+    font-weight: 700;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-title {
+      font-size: 40px;
+    }
+  }
+
+  .swick-link-underline {
+    display: inline-block;
+    padding-block: 12px;
+    font-family: var(--font-body--family);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    color: var(--swick-ink);
+  }
+
+  .swick-visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Shared carousel base (swick-slideshow element): used by the slideshow section and the product gallery. */
+  .swick-slideshow {
+    position: relative;
+    display: block;
+    width: 100%;
+    background-color: var(--swick-ink, #111);
+  }
+
+  .swick-slideshow__track {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .swick-slideshow__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .swick-slideshow__slide {
+    position: relative;
+    flex: 0 0 100%;
+    aspect-ratio: var(--swick-ratio, 1 / 1);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow: hidden;
+  }
+
+  .swick-slideshow__arrow {
+    position: absolute;
+    inset-block-start: 50%;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-block-start: -22px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.35));
+  }
+
+  .swick-slideshow__arrow svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .swick-slideshow__arrow--prev { inset-inline-start: 4px; }
+  .swick-slideshow__arrow--next { inset-inline-end: 4px; }
+
+  .swick-slideshow__arrow:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+  }
+
+{% endstylesheet %}

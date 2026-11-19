@@ -1,0 +1,135 @@
+{%- comment -%}
+  Swick — "YOU MAY / ALSO LIKE" (Snitch-style) product recommendations.
+  First paint renders an empty shell; assets/swick.js fetches this same section through
+  Shopify's recommendations endpoint and swaps in the 2-column card grid. Hidden when empty.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign rec_url = routes.product_recommendations_url | append: '?section_id=' | append: section.id | append: '&product_id=' | append: product.id | append: '&limit=' | append: s.limit | append: '&intent=' | append: s.intent
+  assign is_empty = false
+  if recommendations.performed and recommendations.products_count == 0
+    assign is_empty = true
+  endif
+-%}
+
+{% render 'swick-assets' %}
+
+<swick-recommendations
+  class="swick-recs"
+  data-url="{{ rec_url }}"
+  data-loaded="{{ recommendations.performed }}"
+  data-empty="{{ is_empty }}"
+>
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <h2 class="swick-title swick-recs__title">
+      {%- if s.heading_light != blank -%}<span class="swick-title__light">{{ s.heading_light | escape }}</span>{%- endif -%}
+      {%- if s.heading_bold != blank -%}<span class="swick-title__bold">{{ s.heading_bold | escape }}</span>{%- endif -%}
+    </h2>
+    <ul class="swick-recs__grid" role="list">
+      {%- for rec in recommendations.products -%}
+        <li class="swick-recs__cell">{%- render 'swick-product-card', product: rec, lazy: true -%}</li>
+      {%- endfor -%}
+    </ul>
+  {%- elsif request.design_mode and product == blank -%}
+    <h2 class="swick-title swick-recs__title">
+      <span class="swick-title__light">{{ s.heading_light | escape }}</span>
+      <span class="swick-title__bold">{{ s.heading_bold | escape }}</span>
+    </h2>
+    <ul class="swick-recs__grid" role="list">
+      <li class="swick-recs__cell">{%- render 'swick-product-card', placeholder_title: 'Sandal Mist Room Spray', placeholder_price: '₹399', placeholder_format: 'Room Spray', placeholder_index: 2 -%}</li>
+      <li class="swick-recs__cell">{%- render 'swick-product-card', placeholder_title: 'Lavender Sleep Linen Spray', placeholder_price: '₹349', placeholder_format: 'Linen Spray', placeholder_index: 3 -%}</li>
+    </ul>
+  {%- endif -%}
+</swick-recommendations>
+
+{% stylesheet %}
+  .swick-recs {
+    display: block;
+    padding-block: 28px 32px;
+    background-color: var(--swick-surface, #fff);
+  }
+
+  .swick-recs:empty {
+    padding: 0;
+  }
+
+  .swick-recs__title {
+    padding-inline: var(--swick-gutter, 16px);
+    padding-block-end: 16px;
+  }
+
+  .swick-recs__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .swick-recs__cell {
+    min-width: 0;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-recs__title {
+      padding-inline: 48px;
+    }
+
+    .swick-recs__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 36px 8px;
+      padding-inline: 48px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick recommendations",
+  "tag": "section",
+  "class": "swick-recs-section",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_light",
+      "label": "Heading (light line)",
+      "default": "You may"
+    },
+    {
+      "type": "text",
+      "id": "heading_bold",
+      "label": "Heading (bold line)",
+      "default": "Also like"
+    },
+    {
+      "type": "select",
+      "id": "intent",
+      "label": "Recommendation type",
+      "options": [
+        { "value": "related", "label": "Related" },
+        { "value": "complementary", "label": "Complementary (Search & Discovery app)" }
+      ],
+      "default": "related"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Products",
+      "min": 2,
+      "max": 10,
+      "step": 2,
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick recommendations"
+    }
+  ]
+}
+{% endschema %}

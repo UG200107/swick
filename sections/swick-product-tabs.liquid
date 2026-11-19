@@ -1,0 +1,261 @@
+{%- comment -%}
+  Swick — "TRENDING" product tabs (Snitch-style).
+  Bold heading, horizontally scrollable uppercase tabs with an underline indicator,
+  and an edge-to-edge 2-column product grid per tab. All panels render server-side;
+  tabs only toggle visibility, so it works before JS loads (first panel shows).
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign ph_names = 'Blended Camphor — Rose & Vetiver|Pure Bhimseni Camphor Tablets|Sandal Mist Room Spray|Lavender Sleep Linen Spray|Mogra Temple Fragrance|Lemongrass Aroma Oil|Discovery Box — 6 Minis|Kapoor Agarbatti Cones'
+  assign ph_names = ph_names | split: '|'
+  assign ph_formats = 'Blended Camphor|Pure Camphor|Room Spray|Linen Spray|Temple Fragrance|Aroma Oil|Discovery Kit|Temple Fragrance'
+  assign ph_formats = ph_formats | split: '|'
+  assign ph_prices = '₹249|₹199|₹399|₹349|₹299|₹449|₹599|₹179'
+  assign ph_prices = ph_prices | split: '|'
+-%}
+
+{% render 'swick-assets' %}
+
+<div class="swick-tabs-wrap">
+  {%- if s.heading != blank -%}
+    <h2 class="swick-title swick-tabs-wrap__title"><span class="swick-title__bold">{{ s.heading | escape }}</span></h2>
+  {%- endif -%}
+
+  <swick-tabs class="swick-tabs">
+    <div class="swick-tabs__bar">
+      <div class="swick-tabs__list" role="tablist" aria-label="{{ s.heading | default: 'Products' | escape }}">
+        {%- for block in section.blocks -%}
+          {%- assign label = block.settings.label | default: block.settings.collection.title | default: 'All' -%}
+          <button
+            type="button"
+            role="tab"
+            id="SwickTab-{{ section.id }}-{{ forloop.index }}"
+            class="swick-tabs__tab"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            aria-controls="SwickPanel-{{ section.id }}-{{ forloop.index }}"
+            tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            {{- label | escape -}}
+          </button>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign tab_collection = block.settings.collection
+        assign tab_index = forloop.index
+        assign offset = forloop.index0 | times: 2
+      -%}
+      <div
+        role="tabpanel"
+        id="SwickPanel-{{ section.id }}-{{ tab_index }}"
+        class="swick-tabs__panel"
+        aria-labelledby="SwickTab-{{ section.id }}-{{ tab_index }}"
+        tabindex="0"
+        {% unless forloop.first %}
+          hidden
+        {% endunless %}
+      >
+        <ul class="swick-tabs__grid" role="list">
+          {%- if tab_collection != blank and tab_collection.products_count > 0 -%}
+            {%- for product in tab_collection.products limit: s.products_per_tab -%}
+              <li class="swick-tabs__cell">
+                {%- render 'swick-product-card', product: product, lazy: true -%}
+              </li>
+            {%- endfor -%}
+          {%- else -%}
+            {%- for i in (1..s.products_per_tab) -%}
+              {%- liquid
+                assign n = i | minus: 1 | plus: offset | modulo: 8
+              -%}
+              <li class="swick-tabs__cell">
+                {%- render 'swick-product-card',
+                  placeholder_title: ph_names[n],
+                  placeholder_price: ph_prices[n],
+                  placeholder_format: ph_formats[n],
+                  placeholder_index: n
+                -%}
+              </li>
+            {%- endfor -%}
+          {%- endif -%}
+        </ul>
+
+        {%- if s.view_all_label != blank -%}
+          {%- assign view_all_url = tab_collection.url | default: routes.all_products_collection_url -%}
+          <p class="swick-tabs__more">
+            <a href="{{ view_all_url }}" class="swick-link-underline">{{ s.view_all_label | escape }}</a>
+          </p>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </swick-tabs>
+</div>
+
+{% stylesheet %}
+  .swick-tabs-wrap {
+    padding-block: 32px 24px;
+    background-color: var(--swick-surface, #fff);
+  }
+
+  .swick-tabs-wrap__title {
+    padding-inline: var(--swick-gutter, 16px);
+    padding-block-end: 14px;
+  }
+
+  .swick-tabs__bar {
+    border-block-end: 1px solid var(--swick-line, #e4e4e4);
+  }
+
+  .swick-tabs__list {
+    display: flex;
+    gap: 28px;
+    padding-inline: var(--swick-gutter, 16px);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .swick-tabs__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .swick-tabs__tab {
+    position: relative;
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 10px 0 12px;
+    border: 0;
+    background: none;
+    font-family: var(--font-body--family);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--swick-ink, #111);
+    cursor: pointer;
+  }
+
+  .swick-tabs__tab[aria-selected='true'] {
+    font-weight: 700;
+  }
+
+  .swick-tabs__tab[aria-selected='true']::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: -1px;
+    height: 3px;
+    background-color: var(--swick-ink, #111);
+  }
+
+  .swick-tabs__tab:focus-visible {
+    outline: 2px solid var(--swick-ink, #111);
+    outline-offset: 2px;
+  }
+
+  .swick-tabs__panel {
+    padding-block-start: 8px;
+  }
+
+  .swick-tabs__panel:focus-visible {
+    outline: none;
+  }
+
+  .swick-tabs__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-tabs-wrap__title,
+    .swick-tabs__list {
+      padding-inline: 48px;
+    }
+
+    .swick-tabs__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 36px 8px;
+      padding-inline: 48px;
+    }
+  }
+
+  .swick-tabs__cell {
+    min-width: 0;
+  }
+
+  .swick-tabs__more {
+    margin: 0;
+    padding-block-start: 20px;
+    text-align: center;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick product tabs",
+  "tag": "section",
+  "class": "swick-tabs-section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Trending"
+    },
+    {
+      "type": "range",
+      "id": "products_per_tab",
+      "label": "Products per tab",
+      "min": 2,
+      "max": 12,
+      "step": 2,
+      "default": 6
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "View all label",
+      "default": "View all"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Tab label",
+          "info": "Defaults to the collection title."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick product tabs",
+      "blocks": [
+        { "type": "tab", "settings": { "label": "All" } },
+        { "type": "tab", "settings": { "label": "Camphor" } },
+        { "type": "tab", "settings": { "label": "Room Sprays" } },
+        { "type": "tab", "settings": { "label": "Linen" } },
+        { "type": "tab", "settings": { "label": "Temple" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

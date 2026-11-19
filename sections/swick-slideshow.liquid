@@ -1,0 +1,362 @@
+{%- comment -%}
+  Swick — Snitch-style full-bleed slideshow.
+  Swipe (scroll-snap) on touch, thin chevron arrows, optional autoplay.
+  Each slide: desktop + mobile image, big bold headline bottom-left, light side text bottom-right.
+  Used for the top hero and for tall editorial banners further down the page.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign above_fold = false
+  if section.index and section.index <= 2
+    assign above_fold = true
+  endif
+  assign slide_count = section.blocks.size
+-%}
+
+{% render 'swick-assets' %}
+
+<swick-slideshow
+  class="swick-slideshow swick-slideshow--m-{{ s.mobile_ratio }} swick-slideshow--d-{{ s.desktop_ratio }}"
+  data-autoplay="{{ s.autoplay_seconds }}"
+  role="region"
+  aria-roledescription="carousel"
+  aria-label="{{ s.accessibility_label | escape }}"
+>
+  <ul class="swick-slideshow__track" data-swick-track role="list">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign b = block.settings
+        assign img_d = b.image_desktop | default: b.image_mobile
+        assign img_m = b.image_mobile | default: b.image_desktop
+        assign eager = false
+        if above_fold and forloop.first
+          assign eager = true
+        endif
+      -%}
+      <li
+        class="swick-slideshow__slide"
+        data-swick-slide
+        aria-roledescription="slide"
+        aria-label="{{ forloop.index }} / {{ slide_count }}"
+        style="--swick-slide-text: {{ b.text_color }}; --swick-slide-accent: {{ b.headline_color }};"
+        {{ block.shopify_attributes }}
+      >
+        {%- if b.link != blank -%}
+          <a href="{{ b.link }}" class="swick-slideshow__link">
+        {%- else -%}
+          <div class="swick-slideshow__link">
+        {%- endif -%}
+
+        {%- if img_d != blank -%}
+          <picture class="swick-slideshow__media">
+            <source
+              media="(min-width: 750px)"
+              srcset="{{ img_d | image_url: width: 1100 }} 1100w, {{ img_d | image_url: width: 1500 }} 1500w, {{ img_d | image_url: width: 1920 }} 1920w, {{ img_d | image_url: width: 2560 }} 2560w"
+              sizes="100vw"
+              width="{{ img_d.width }}"
+              height="{{ img_d.height }}"
+            >
+            {%- if eager -%}
+              {{
+                img_m
+                | image_url: width: 1100
+                | image_tag:
+                  widths: '375, 550, 750, 1100',
+                  sizes: '100vw',
+                  loading: 'eager',
+                  fetchpriority: 'high',
+                  alt: img_m.alt,
+                  class: 'swick-slideshow__img'
+              }}
+            {%- else -%}
+              {{
+                img_m
+                | image_url: width: 1100
+                | image_tag:
+                  widths: '375, 550, 750, 1100',
+                  sizes: '100vw',
+                  loading: 'lazy',
+                  alt: img_m.alt,
+                  class: 'swick-slideshow__img'
+              }}
+            {%- endif -%}
+          </picture>
+        {%- else -%}
+          {%- assign tone = forloop.index0 | modulo: 3 -%}
+          <span class="swick-slideshow__media swick-slideshow__ph swick-slideshow__ph--{{ tone }}" aria-hidden="true">
+            {%- case tone -%}
+              {%- when 0 -%}{%- render 'swick-icon', icon: 'spray', class: 'swick-slideshow__ph-icon' -%}
+              {%- when 1 -%}{%- render 'swick-icon', icon: 'diya', class: 'swick-slideshow__ph-icon' -%}
+              {%- else -%}{%- render 'swick-icon', icon: 'leaf', class: 'swick-slideshow__ph-icon' -%}
+            {%- endcase -%}
+          </span>
+        {%- endif -%}
+
+        {%- if b.headline != blank or b.side_text != blank -%}
+          <span class="swick-slideshow__scrim" aria-hidden="true"></span>
+          <span class="swick-slideshow__copy">
+            {%- if b.headline != blank -%}
+              <span class="swick-slideshow__headline">{{ b.headline | escape | newline_to_br }}</span>
+            {%- endif -%}
+            {%- if b.side_text != blank -%}
+              <span class="swick-slideshow__side">{{ b.side_text | escape | newline_to_br }}</span>
+            {%- endif -%}
+          </span>
+        {%- endif -%}
+
+        {%- if b.link != blank -%}
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  {%- if slide_count > 1 and s.show_arrows -%}
+    <button type="button" class="swick-slideshow__arrow swick-slideshow__arrow--prev" data-swick-prev aria-label="{{ 'accessibility.slideshow_previous' | t | escape }}">
+      {%- render 'swick-icon', icon: 'chevron-left' -%}
+    </button>
+    <button type="button" class="swick-slideshow__arrow swick-slideshow__arrow--next" data-swick-next aria-label="{{ 'accessibility.slideshow_next' | t | escape }}">
+      {%- render 'swick-icon', icon: 'chevron-right' -%}
+    </button>
+  {%- endif -%}
+
+  {%- if slide_count > 1 -%}
+    <p
+      class="swick-visually-hidden"
+      aria-live="polite"
+      data-swick-status
+      data-template="{{ 'accessibility.slide_status' | t: index: '[index]', length: '[length]' | escape }}"
+    ></p>
+  {%- endif -%}
+</swick-slideshow>
+
+{%- if s.spacing_bottom > 0 -%}
+  <div class="swick-slideshow-spacer" style="height: {{ s.spacing_bottom }}px;" aria-hidden="true"></div>
+{%- endif -%}
+
+{% stylesheet %}
+  .swick-slideshow--m-square { --swick-ratio: 1 / 1; }
+  .swick-slideshow--m-portrait { --swick-ratio: 4 / 5; }
+  .swick-slideshow--m-tall { --swick-ratio: 2 / 3; }
+
+  @media screen and (min-width: 750px) {
+    .swick-slideshow--d-wide { --swick-ratio: 16 / 9; }
+    .swick-slideshow--d-ultrawide { --swick-ratio: 21 / 9; }
+    .swick-slideshow--d-square { --swick-ratio: 1 / 1; }
+  }
+
+  .swick-slideshow__link {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: var(--swick-slide-text, #fff);
+    text-decoration: none;
+  }
+
+  .swick-slideshow__media,
+  .swick-slideshow__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .swick-slideshow__img {
+    object-fit: cover;
+  }
+
+  .swick-slideshow__ph {
+    display: grid;
+    place-items: center;
+    color: rgb(255 255 255 / 0.12);
+  }
+
+  .swick-slideshow__ph--0 { background: radial-gradient(120% 90% at 70% 20%, #4a4a4a 0%, #1c1c1c 70%); }
+  .swick-slideshow__ph--1 { background: radial-gradient(120% 90% at 30% 25%, #5a4636 0%, #1d1713 70%); }
+  .swick-slideshow__ph--2 { background: radial-gradient(120% 90% at 60% 30%, #3f4a43 0%, #161a17 70%); }
+
+  .swick-slideshow__ph-icon {
+    width: 46%;
+    height: auto;
+    stroke-width: 0.6;
+  }
+
+  .swick-slideshow__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.45) 0%, rgb(0 0 0 / 0) 45%);
+    pointer-events: none;
+  }
+
+  .swick-slideshow__copy {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 var(--swick-gutter, 16px) 13%;
+  }
+
+  .swick-slideshow__headline {
+    min-width: 0;
+    font-family: var(--font-body--family);
+    font-size: clamp(34px, 10.5vw, 72px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    color: var(--swick-slide-accent, #fff);
+    overflow-wrap: anywhere;
+  }
+
+  .swick-slideshow__side {
+    flex: 0 0 auto;
+    max-width: 42%;
+    font-family: var(--font-body--family);
+    font-size: clamp(15px, 4.4vw, 22px);
+    font-weight: 300;
+    line-height: 1.15;
+    text-align: end;
+    color: var(--swick-slide-text, #fff);
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-slideshow__copy {
+      padding: 0 48px 64px;
+    }
+  }
+
+  .swick-slideshow__link:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick slideshow",
+  "tag": "section",
+  "class": "swick-slideshow-section",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "select",
+      "id": "mobile_ratio",
+      "label": "Mobile shape",
+      "options": [
+        { "value": "square", "label": "Square (1:1)" },
+        { "value": "portrait", "label": "Portrait (4:5)" },
+        { "value": "tall", "label": "Tall (2:3)" }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "select",
+      "id": "desktop_ratio",
+      "label": "Desktop shape",
+      "options": [
+        { "value": "wide", "label": "Wide (16:9)" },
+        { "value": "ultrawide", "label": "Ultra wide (21:9)" },
+        { "value": "square", "label": "Square (1:1)" }
+      ],
+      "default": "wide"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_seconds",
+      "label": "Auto-rotate every",
+      "info": "0 turns auto-rotate off. It stops as soon as a shopper swipes or taps.",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "spacing_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "accessibility_label",
+      "label": "Screen reader label",
+      "default": "Featured collections"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile image",
+          "info": "Match the mobile shape above. 1100px wide or more."
+        },
+        {
+          "type": "image_picker",
+          "id": "image_desktop",
+          "label": "Desktop image",
+          "info": "Match the desktop shape above. 2560px wide or more."
+        },
+        {
+          "type": "textarea",
+          "id": "headline",
+          "label": "Headline",
+          "info": "Short and punchy. Use line breaks to control wrapping."
+        },
+        {
+          "type": "textarea",
+          "id": "side_text",
+          "label": "Side text"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "color",
+          "id": "headline_color",
+          "label": "Headline color",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Side text color",
+          "default": "#FFFFFF"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick slideshow",
+      "blocks": [
+        { "type": "slide", "settings": { "headline": "Pure\nrituals", "side_text": "Nature\nBottled" } },
+        { "type": "slide", "settings": { "headline": "Temple\nready", "side_text": "Pooja\nessentials", "headline_color": "#E9B98F" } },
+        { "type": "slide", "settings": { "headline": "Fresh\nlinen", "side_text": "Room &\nlinen sprays" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

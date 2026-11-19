@@ -1,0 +1,58 @@
+{%- doc -%}
+  One item of the Swick bottom nav.
+
+  @param {object} block - The "item" block of sections/swick-bottom-nav.liquid.
+
+  @example
+  {% render 'swick-bottom-nav-item', block: block %}
+{%- enddoc -%}
+
+{%- liquid
+  assign b = block.settings
+  assign href = b.link | default: routes.root_url
+  if b.action == 'cart'
+    assign href = routes.cart_url
+  elsif b.action == 'search'
+    assign href = routes.search_url
+  elsif b.action == 'menu' and b.link == blank
+    assign href = routes.collections_url
+  endif
+
+  assign active = false
+  if b.action == 'link'
+    if b.link == blank or b.link == routes.root_url
+      if request.page_type == 'index'
+        assign active = true
+      endif
+    elsif request.path == b.link
+      assign active = true
+    endif
+  elsif b.action == 'cart' and request.page_type == 'cart'
+    assign active = true
+  elsif b.action == 'search' and request.page_type == 'search'
+    assign active = true
+  endif
+-%}
+
+<li class="swick-bnav__cell" {{ block.shopify_attributes }}>
+  <a
+    href="{{ href }}"
+    class="swick-bnav__item{% if active %} is-active{% endif %}"
+    {% if b.action != 'link' %}
+      data-swick-action="{{ b.action }}"
+    {% endif %}
+    {% if active %}
+      aria-current="page"
+    {% endif %}
+  >
+    <span class="swick-bnav__icon">
+      {%- render 'swick-icon', icon: b.icon -%}
+      {%- if b.action == 'cart' -%}
+        <span class="swick-bnav__count" data-swick-cart-count {% if cart.item_count == 0 %}hidden{% endif %}>
+          {%- if cart.item_count > 99 -%}99+{%- else -%}{{ cart.item_count }}{%- endif -%}
+        </span>
+      {%- endif -%}
+    </span>
+    <span class="swick-bnav__label">{{ b.label | escape }}</span>
+  </a>
+</li>

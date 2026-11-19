@@ -1,0 +1,180 @@
+{%- comment -%}
+  Swick — split promo strip (Snitch-style): copy left, cut-out image centre, offer right,
+  on a soft grey band. The whole strip is one link.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign url = s.link | default: routes.all_products_collection_url
+-%}
+
+{% render 'swick-assets' %}
+
+<div class="swick-promo-wrap" style="--swick-promo-bg: {{ s.background }}; --swick-promo-fg: {{ s.text_color }}; padding-block: {{ s.spacing_top }}px {{ s.spacing_bottom }}px;">
+  <a href="{{ url }}" class="swick-promo">
+    <span class="swick-promo__text swick-promo__text--left">{{ s.text_left | escape | newline_to_br }}</span>
+    <span class="swick-promo__media">
+      {%- if s.image != blank -%}
+        {{
+          s.image
+          | image_url: width: 600
+          | image_tag:
+            widths: '200, 300, 400, 600',
+            sizes: '(min-width: 750px) 25vw, 40vw',
+            loading: 'lazy',
+            alt: s.image.alt,
+            class: 'swick-promo__img'
+        }}
+      {%- else -%}
+        {%- render 'swick-icon', icon: 'bottle', class: 'swick-promo__icon' -%}
+      {%- endif -%}
+    </span>
+    <span class="swick-promo__text swick-promo__text--right">{{ s.text_right | escape | newline_to_br }}</span>
+  </a>
+</div>
+
+{% stylesheet %}
+  .swick-promo-wrap {
+    background-color: var(--swick-surface, #fff);
+  }
+
+  .swick-promo {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr 1fr;
+    align-items: center;
+    gap: 6px;
+    aspect-ratio: 16 / 10;
+    max-height: 420px;
+    width: 100%;
+    padding-inline: var(--swick-gutter, 16px);
+    box-sizing: border-box;
+    overflow: hidden;
+    background-color: var(--swick-promo-bg, #efefef);
+    color: var(--swick-promo-fg, #111);
+    text-decoration: none;
+  }
+
+  .swick-promo__text {
+    font-family: var(--font-body--family);
+    font-size: clamp(16px, 4.8vw, 40px);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .swick-promo__text--left {
+    text-align: end;
+  }
+
+  .swick-promo__text--right {
+    font-weight: 700;
+  }
+
+  .swick-promo__media {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    align-self: stretch;
+    min-width: 0;
+  }
+
+  .swick-promo__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+  }
+
+  .swick-promo__icon {
+    width: 70%;
+    height: auto;
+    align-self: center;
+    stroke-width: 0.9;
+    color: #9a9a9a;
+  }
+
+  .swick-promo:focus-visible {
+    outline: 2px solid var(--swick-ink, #111);
+    outline-offset: -3px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-promo {
+      aspect-ratio: 32 / 9;
+      padding-inline: 48px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick promo banner",
+  "tag": "section",
+  "class": "swick-promo-section",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "text_left",
+      "label": "Left text",
+      "default": "Last few\nbestsellers\nleft"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Centre image",
+      "info": "Cut-out (transparent PNG) works best; it sits on the bottom edge."
+    },
+    {
+      "type": "textarea",
+      "id": "text_right",
+      "label": "Right text",
+      "default": "Up to 30% off"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#EFEFEF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "spacing_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "spacing_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick promo banner"
+    }
+  ]
+}
+{% endschema %}

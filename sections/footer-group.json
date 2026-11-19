@@ -190,10 +190,73 @@
         "padding-block-start": 20,
         "padding-block-end": 48
       }
+    },
+    "swick_bottom_nav": {
+      "type": "swick-bottom-nav",
+      "blocks": {
+        "nav_home": {
+          "type": "item",
+          "settings": {
+            "label": "Home",
+            "icon": "home",
+            "action": "link",
+            "link": ""
+          }
+        },
+        "nav_menu": {
+          "type": "item",
+          "settings": {
+            "label": "Menu",
+            "icon": "menu",
+            "action": "menu",
+            "link": ""
+          }
+        },
+        "nav_new": {
+          "type": "item",
+          "settings": {
+            "label": "New",
+            "icon": "new",
+            "action": "link",
+            "link": "shopify://collections/all"
+          }
+        },
+        "nav_bag": {
+          "type": "item",
+          "settings": {
+            "label": "Bag",
+            "icon": "bag",
+            "action": "cart",
+            "link": ""
+          }
+        },
+        "nav_offers": {
+          "type": "item",
+          "settings": {
+            "label": "Offers",
+            "icon": "gift",
+            "action": "link",
+            "link": "shopify://collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "nav_home",
+        "nav_menu",
+        "nav_new",
+        "nav_bag",
+        "nav_offers"
+      ],
+      "settings": {
+        "detach_last": true,
+        "hide_header_cart": true,
+        "accessibility_label": "Quick navigation"
+      }
     }
   },
   "order": [
     "footer_m9NzUG",
-    "footer_utilities_jLGE8U"
+    "footer_utilities_jLGE8U",
+    "swick_bottom_nav"
   ]
 }

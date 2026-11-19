@@ -1,0 +1,302 @@
+{%- doc -%}
+  Snitch-style product card: edge-to-edge 3:4 image on a soft grey tile, wishlist heart,
+  one-line title, bold price and a "+" quick add. Renders a realistic Swick placeholder
+  when no product is passed.
+
+  @param {product} [product] - Product to render. Omit to render a placeholder card.
+  @param {string} [placeholder_title] - Placeholder product name.
+  @param {string} [placeholder_price] - Placeholder price text, e.g. "₹249".
+  @param {string} [placeholder_format] - Placeholder format sub-label.
+  @param {number} [placeholder_index] - Used to vary the placeholder illustration.
+  @param {boolean} [lazy] - Lazy-load the image. Defaults to true.
+
+  @example
+  {% render 'swick-product-card', product: product, lazy: false %}
+{%- enddoc -%}
+
+{%- liquid
+  assign loading = 'lazy'
+  if lazy == false
+    assign loading = 'eager'
+  endif
+-%}
+
+{%- if product -%}
+  {%- liquid
+    assign variant = product.selected_or_first_available_variant
+    assign format_label = product.metafields.custom.format_type.value
+    assign single_variant = false
+    if product.has_only_default_variant or product.variants.size == 1
+      assign single_variant = true
+    endif
+  -%}
+  <article class="swick-card">
+    <div class="swick-card__media">
+      <a href="{{ product.url }}" class="swick-card__media-link" tabindex="-1" aria-hidden="true">
+        {%- if product.featured_media -%}
+          {{
+            product.featured_media.preview_image
+            | image_url: width: 720
+            | image_tag:
+              widths: '240, 360, 480, 720',
+              sizes: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw',
+              loading: loading,
+              alt: '',
+              class: 'swick-card__image'
+          }}
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'swick-card__image swick-card__image--svg' }}
+        {%- endif -%}
+      </a>
+      <swick-wishlist class="swick-card__wish" data-handle="{{ product.handle }}">
+        <button type="button" class="swick-card__wish-btn" aria-pressed="false" aria-label="Save {{ product.title | escape }} to wishlist">
+          {%- render 'swick-icon', icon: 'heart' -%}
+        </button>
+      </swick-wishlist>
+    </div>
+
+    <div class="swick-card__info">
+      {%- if format_label != blank -%}
+        <p class="swick-card__format">{{ format_label | escape }}</p>
+      {%- endif -%}
+      <h3 class="swick-card__title">
+        <a href="{{ product.url }}" class="swick-card__title-link">{{ product.title | escape }}</a>
+      </h3>
+      <div class="swick-card__row">
+        <p class="swick-card__price">
+          {%- if product.compare_at_price > product.price -%}
+            <span class="swick-visually-hidden">Sale price</span>
+          {%- endif -%}
+          {{ product.price | money_without_trailing_zeros }}
+          {%- if product.compare_at_price > product.price -%}
+            <s class="swick-card__compare">{{ product.compare_at_price | money_without_trailing_zeros }}</s>
+          {%- endif -%}
+        </p>
+
+        {%- if product.available == false -%}
+          <span class="swick-card__soldout">{{ 'products.product.sold_out' | t }}</span>
+        {%- elsif single_variant -%}
+          <swick-quick-add
+            class="swick-card__add"
+            data-variant-id="{{ variant.id }}"
+            data-product-id="{{ product.id }}"
+            data-added-label="{{ 'actions.added' | t | escape }}"
+          >
+            <button type="button" class="swick-card__add-btn" aria-label="{{ 'actions.add_to_cart' | t | escape }}: {{ product.title | escape }}">
+              {%- render 'swick-icon', icon: 'plus' -%}
+            </button>
+            <span class="swick-visually-hidden" data-swick-live aria-live="polite"></span>
+          </swick-quick-add>
+        {%- else -%}
+          <a href="{{ product.url }}" class="swick-card__add-btn" aria-label="{{ 'actions.add_to_cart' | t | escape }}: {{ product.title | escape }}">
+            {%- render 'swick-icon', icon: 'plus' -%}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </article>
+{%- else -%}
+  {%- liquid
+    assign tint = placeholder_index | default: 0 | modulo: 4
+  -%}
+  <article class="swick-card swick-card--placeholder">
+    <div class="swick-card__media">
+      <span class="swick-card__media-link swick-card__ph swick-card__ph--{{ tint }}" aria-hidden="true">
+        {%- render 'swick-icon', icon: 'bottle', class: 'swick-card__ph-icon' -%}
+      </span>
+      <swick-wishlist class="swick-card__wish" data-handle="placeholder-{{ placeholder_index }}">
+        <button type="button" class="swick-card__wish-btn" aria-pressed="false" aria-label="Save {{ placeholder_title | escape }} to wishlist">
+          {%- render 'swick-icon', icon: 'heart' -%}
+        </button>
+      </swick-wishlist>
+    </div>
+    <div class="swick-card__info">
+      {%- if placeholder_format != blank -%}
+        <p class="swick-card__format">{{ placeholder_format | escape }}</p>
+      {%- endif -%}
+      <h3 class="swick-card__title"><span class="swick-card__title-link">{{ placeholder_title | escape }}</span></h3>
+      <div class="swick-card__row">
+        <p class="swick-card__price">{{ placeholder_price | escape }}</p>
+        <span class="swick-card__add-btn swick-card__add-btn--static" aria-hidden="true">
+          {%- render 'swick-icon', icon: 'plus' -%}
+        </span>
+      </div>
+    </div>
+  </article>
+{%- endif -%}
+
+{% stylesheet %}
+  .swick-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    color: var(--swick-ink, #111);
+  }
+
+  .swick-card__media {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background-color: var(--swick-soft, #f2f2f2);
+  }
+
+  .swick-card__media-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .swick-card__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .swick-card__image--svg {
+    fill: #c9c9c9;
+    background-color: var(--swick-soft, #f2f2f2);
+  }
+
+  .swick-card__ph {
+    display: grid;
+    place-items: center;
+    color: #9a9a9a;
+  }
+
+  .swick-card__ph--0 { background: linear-gradient(180deg, #f4f4f4, #e9e9e9); }
+  .swick-card__ph--1 { background: linear-gradient(180deg, #f3efeb, #e7e0d9); }
+  .swick-card__ph--2 { background: linear-gradient(180deg, #eef1ee, #e0e6e1); }
+  .swick-card__ph--3 { background: linear-gradient(180deg, #f2f2f2, #e4e4e4); }
+
+  .swick-card__ph-icon {
+    width: 34%;
+    height: auto;
+  }
+
+  .swick-card__wish {
+    position: absolute;
+    inset-block-start: 4px;
+    inset-inline-end: 4px;
+  }
+
+  .swick-card__wish-btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--swick-ink, #111);
+    cursor: pointer;
+  }
+
+  .swick-card__wish-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .swick-card__wish-btn[aria-pressed='true'] svg path {
+    fill: var(--swick-accent, #c27d48);
+    stroke: var(--swick-accent, #c27d48);
+  }
+
+  .swick-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 8px 0;
+  }
+
+  .swick-card__format {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--swick-muted, #6b6b6b);
+  }
+
+  .swick-card__title {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.35;
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .swick-card__title-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .swick-card__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 32px;
+  }
+
+  .swick-card__price {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .swick-card__compare {
+    margin-inline-start: 6px;
+    font-weight: 400;
+    color: var(--swick-muted, #6b6b6b);
+  }
+
+  .swick-card__soldout {
+    font-family: var(--font-body--family);
+    font-size: 12px;
+    color: var(--swick-muted, #6b6b6b);
+  }
+
+  .swick-card__add-btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-inline-end: -10px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--swick-ink, #111);
+    cursor: pointer;
+  }
+
+  .swick-card__add-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .swick-card__add-btn.is-loading svg {
+    opacity: 0.3;
+  }
+
+  .swick-card__add-btn:focus-visible,
+  .swick-card__wish-btn:focus-visible {
+    outline: 2px solid var(--swick-ink, #111);
+    outline-offset: -4px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-card__title {
+      font-size: 15px;
+    }
+
+    .swick-card__price {
+      font-size: 15px;
+    }
+  }
+{% endstylesheet %}

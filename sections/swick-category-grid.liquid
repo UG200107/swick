@@ -1,0 +1,310 @@
+{%- comment -%}
+  Swick — "SHOP BY / CATEGORY" grid (Snitch-style).
+  Light + bold two-line heading, accent rule, 3-column hairline-bordered tiles with an
+  uppercase label above a cut-out product image, optional badge pill, and a "Shop all" link.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign shop_all_url = s.shop_all_link | default: routes.all_products_collection_url
+-%}
+
+{% render 'swick-assets' %}
+
+<div class="swick-cats" style="--swick-cats-cols: {{ s.columns_mobile }}; --swick-cats-cols-d: {{ s.columns_desktop }};">
+  {%- if s.heading_light != blank or s.heading_bold != blank -%}
+    <h2 class="swick-title swick-cats__title">
+      {%- if s.heading_light != blank -%}<span class="swick-title__light">{{ s.heading_light | escape }}</span>{%- endif -%}
+      {%- if s.heading_bold != blank -%}<span class="swick-title__bold">{{ s.heading_bold | escape }}</span>{%- endif -%}
+    </h2>
+  {%- endif -%}
+
+  <ul class="swick-cats__grid" role="list">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign b = block.settings
+        assign collection_ref = b.collection
+        assign label = b.label | default: collection_ref.title
+        assign url = b.link | default: collection_ref.url | default: routes.all_products_collection_url
+        assign img = b.image | default: collection_ref.featured_image
+      -%}
+      <li class="swick-cats__item" {{ block.shopify_attributes }}>
+        <a href="{{ url }}" class="swick-cats__tile">
+          <span class="swick-cats__label-row">
+            <span class="swick-cats__label">{{ label | escape }}</span>
+            {%- if b.badge != blank -%}
+              <span class="swick-cats__badge">{{ b.badge | escape }}</span>
+            {%- endif -%}
+          </span>
+          <span class="swick-cats__media">
+            {%- if img != blank -%}
+              {{
+                img
+                | image_url: width: 400
+                | image_tag:
+                  widths: '160, 240, 320, 400',
+                  sizes: '(min-width: 750px) 20vw, 33vw',
+                  loading: 'lazy',
+                  alt: '',
+                  class: 'swick-cats__img'
+              }}
+            {%- else -%}
+              {%- render 'swick-icon', icon: b.icon, class: 'swick-cats__icon' -%}
+            {%- endif -%}
+          </span>
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  {%- if s.shop_all_label != blank -%}
+    <p class="swick-cats__more">
+      <a href="{{ shop_all_url }}" class="swick-link-underline">{{ s.shop_all_label | escape }}</a>
+    </p>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .swick-cats {
+    padding-block: 28px 24px;
+    background-color: var(--swick-surface, #fff);
+  }
+
+  .swick-cats__title {
+    padding-inline: var(--swick-gutter, 16px);
+    padding-block-end: 16px;
+  }
+
+  .swick-cats__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--swick-cats-cols, 3), minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 3px solid var(--swick-accent, #c27d48);
+    border-inline-start: 1px solid var(--swick-line, #e4e4e4);
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-cats__grid {
+      grid-template-columns: repeat(var(--swick-cats-cols-d, 5), minmax(0, 1fr));
+    }
+
+    .swick-cats__title {
+      padding-inline: 48px;
+    }
+  }
+
+  .swick-cats__item {
+    min-width: 0;
+    border-inline-end: 1px solid var(--swick-line, #e4e4e4);
+    border-block-end: 1px solid var(--swick-line, #e4e4e4);
+  }
+
+  .swick-cats__tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    padding: 18px 8px 16px;
+    color: var(--swick-ink, #111);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .swick-cats__label-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    min-height: 2.5em;
+    text-align: center;
+  }
+
+  .swick-cats__label {
+    font-family: var(--font-body--family);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .swick-cats__badge {
+    padding: 2px 7px;
+    border: 1px solid var(--swick-accent, #c27d48);
+    border-radius: 999px;
+    font-family: var(--font-body--family);
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--swick-accent, #c27d48);
+    white-space: nowrap;
+  }
+
+  .swick-cats__media {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+  }
+
+  .swick-cats__img {
+    display: block;
+    width: 88%;
+    height: 88%;
+    object-fit: contain;
+    transition: transform var(--animation-speed-medium, 0.15s) ease;
+  }
+
+  .swick-cats__icon {
+    width: 52%;
+    height: auto;
+    stroke-width: 1;
+    color: #8a8a8a;
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .swick-cats__tile:hover .swick-cats__img {
+      transform: scale(1.04);
+    }
+  }
+
+  .swick-cats__tile:focus-visible {
+    outline: 2px solid var(--swick-ink, #111);
+    outline-offset: -3px;
+  }
+
+  .swick-cats__more {
+    margin: 0;
+    padding-block-start: 16px;
+    text-align: center;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick category grid",
+  "tag": "section",
+  "class": "swick-cats-section",
+  "max_blocks": 18,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_light",
+      "label": "Heading (light line)",
+      "default": "Shop by"
+    },
+    {
+      "type": "text",
+      "id": "heading_bold",
+      "label": "Heading (bold line)",
+      "default": "Category"
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Columns on mobile",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns on desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "text",
+      "id": "shop_all_label",
+      "label": "Shop all label",
+      "default": "Shop all"
+    },
+    {
+      "type": "url",
+      "id": "shop_all_link",
+      "label": "Shop all link",
+      "info": "Defaults to all products."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Fills in the label, link and image when those are blank."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Cut-out image",
+          "info": "Transparent PNG or product on white, square."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge",
+          "info": "Small outlined pill next to the label, e.g. NEW or TRY ALL."
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Placeholder icon",
+          "info": "Shown when there is no image.",
+          "options": [
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "camphor", "label": "Camphor tablet" },
+            { "value": "spray", "label": "Spray bottle" },
+            { "value": "linen", "label": "Linen" },
+            { "value": "diya", "label": "Diya" },
+            { "value": "oil", "label": "Oil drop" },
+            { "value": "bottle", "label": "Bottle" },
+            { "value": "gift", "label": "Gift box" }
+          ],
+          "default": "leaf"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick category grid",
+      "blocks": [
+        { "type": "category", "settings": { "label": "Blended Camphor", "icon": "leaf" } },
+        { "type": "category", "settings": { "label": "Pure Camphor", "icon": "camphor" } },
+        { "type": "category", "settings": { "label": "Room Sprays", "icon": "spray" } },
+        { "type": "category", "settings": { "label": "Linen Sprays", "icon": "linen" } },
+        { "type": "category", "settings": { "label": "Temple Fragrance", "icon": "diya" } },
+        { "type": "category", "settings": { "label": "Room Fresheners", "icon": "bottle" } },
+        { "type": "category", "settings": { "label": "Aroma Oils", "icon": "oil" } },
+        { "type": "category", "settings": { "label": "Discovery Kits", "icon": "gift", "badge": "Try all" } },
+        { "type": "category", "settings": { "label": "Bestsellers", "icon": "spray" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

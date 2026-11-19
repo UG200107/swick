@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "main": {
       "type": "product-information",
@@ -322,7 +323,8 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 0,
         "padding-block-end": 0
-      }
+      },
+      "disabled": true
     },
     "product_recommendations_qggXJq": {
       "type": "product-recommendations",
@@ -464,10 +466,96 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 48,
         "padding-block-end": 48
+      },
+      "disabled": true
+    },
+    "swick_main": {
+      "type": "swick-product",
+      "blocks": {
+        "acc_description": {
+          "type": "accordion",
+          "settings": {
+            "title": "Description",
+            "source": "description",
+            "open": false,
+            "content": ""
+          }
+        },
+        "acc_notes": {
+          "type": "accordion",
+          "settings": {
+            "title": "Scent notes",
+            "source": "scent_notes",
+            "open": false,
+            "content": ""
+          }
+        },
+        "acc_how": {
+          "type": "accordion",
+          "settings": {
+            "title": "How to use",
+            "source": "how_to_use",
+            "open": false,
+            "content": ""
+          }
+        },
+        "acc_reviews": {
+          "type": "accordion",
+          "settings": {
+            "title": "Reviews",
+            "source": "reviews",
+            "open": false,
+            "content": ""
+          }
+        },
+        "acc_returns": {
+          "type": "accordion",
+          "settings": {
+            "title": "Returns",
+            "source": "custom",
+            "open": false,
+            "content": "<p>Unopened products can be returned within 7 days of delivery. Damaged in transit? Share a photo within 48 hours and we'll replace it.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "acc_description",
+        "acc_notes",
+        "acc_how",
+        "acc_reviews",
+        "acc_returns"
+      ],
+      "settings": {
+        "own_header_mobile": true,
+        "preselect_variant": false,
+        "tax_note": "*MRP inclusive of all taxes",
+        "offer_text": "Get 10% off on prepaid UPI orders",
+        "add_label": "Add to bag",
+        "guide_label": "",
+        "guide_link": "",
+        "delivery_strip": "FREE delivery on orders above ₹699",
+        "show_pincode": true,
+        "pincode_heading": "Delivery",
+        "delivery_min_days": 3,
+        "delivery_max_days": 6,
+        "blocked_prefixes": "",
+        "cod_note": "Cash on Delivery available",
+        "select_option_msg": "Please select your [option] to check delivery date"
+      }
+    },
+    "swick_recs": {
+      "type": "swick-recommendations",
+      "settings": {
+        "heading_light": "You may",
+        "heading_bold": "Also like",
+        "intent": "related",
+        "limit": 4
       }
     }
   },
   "order": [
+    "swick_main",
+    "swick_recs",
     "main",
     "product_recommendations_qggXJq"
   ]
