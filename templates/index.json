@@ -116,11 +116,13 @@
             "height": "fit",
             "custom_height": 100,
             "background_media": "none",
+            "background_color": "",
             "video_position": "cover",
             "background_image_position": "cover",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
+            "border_color": "",
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -138,10 +140,12 @@
                 "alignment": "left",
                 "type_preset": "h4",
                 "font": "var(--font-body--family)",
+                "font_size": "1rem",
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
                 "wrap": "pretty",
+                "text_color": "",
                 "background": false,
                 "background_color": "#00000026",
                 "corner_radius": 0,
@@ -159,6 +163,10 @@
                 "label": "View all",
                 "open_in_new_tab": false,
                 "style_class": "link",
+                "custom_button_background": "{{ settings.color_palette.foreground }}",
+                "custom_button_text": "{{ settings.color_palette.background }}",
+                "custom_button_border": "{{ settings.color_palette.background }}",
+                "link_text_color": "",
                 "width": "fit-content",
                 "custom_width": 100,
                 "width_mobile": "fit-content",
@@ -178,9 +186,11 @@
           "static": true,
           "settings": {
             "product_card_gap": 4,
+            "background_color": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
+            "border_color": "",
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -196,6 +206,7 @@
                 "border": "none",
                 "border_width": 1,
                 "border_opacity": 100,
+                "border_color": "",
                 "border_radius": 0,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
@@ -218,6 +229,7 @@
                 "letter_spacing": "normal",
                 "case": "none",
                 "wrap": "pretty",
+                "text_color": "",
                 "background": false,
                 "background_color": "#00000026",
                 "corner_radius": 0,
@@ -243,6 +255,7 @@
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
+                "text_color": "",
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
@@ -258,6 +271,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "t:names.product_list",
       "settings": {
         "collection": "all",
@@ -277,8 +291,7 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 48,
         "padding-block-end": 48
-      },
-      "disabled": true
+      }
     },
     "swick_category_grid": {
       "type": "swick-category-grid",
@@ -499,26 +512,10 @@
             "image_width": 920,
             "image_height": 1236
           }
-        },
-        "stage_camphor": {
-          "type": "slide",
-          "settings": {
-            "caption": "Pure Bhimseni camphor, crystal-clear and temple-ready.",
-            "link": "shopify://products/swick-100-pure-bhimseni-camphor-for-pooja-meditation-diffusers"
-          }
-        },
-        "stage_oil": {
-          "type": "slide",
-          "settings": {
-            "caption": "Aroma oils distilled from Indian herbs and flowers.",
-            "link": ""
-          }
         }
       },
       "block_order": [
-        "stage_mist",
-        "stage_camphor",
-        "stage_oil"
+        "stage_mist"
       ],
       "settings": {
         "wordmark_line_1": "Nature.",
@@ -534,7 +531,7 @@
         "autoplay_seconds": 4,
         "show_thumbnails": true,
         "show_arrows": false,
-        "badge_text": "Shop now • Nature bottled • ",
+        "badge_text": "Shop now • Nature bottled •",
         "badge_label": "Shop now",
         "badge_link": "shopify://collections/all",
         "product_position": "right"
