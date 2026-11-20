@@ -1,0 +1,924 @@
+{%- comment -%}
+  Section contract.
+  Swick combo builder ("Buy 3 for ₹999"). Each "step" block points at a collection; the shopper
+  must pick exactly one product from every step, so a combo always mixes collections.
+  It is a real /cart/add form (items[n][id]) and works without JavaScript; <swick-combo> adds the
+  picks tray, running total and adds every line in one request.
+  Each line carries a hidden `_combo` property (the "Combo tag" setting) so the store's discount
+  can target combo lines. The combo price shown here is display only: the actual price cut comes
+  from a discount set up in Shopify admin.
+  @example
+  <!-- templates/page.combo.json → assign the "combo" template to a page, then link banners to it -->
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign step_count = section.blocks.size
+  assign combo_cents = s.combo_price | times: 100
+  assign heading = s.heading
+  if heading == blank and page
+    assign heading = page.title
+  endif
+-%}
+
+{% render 'swick-assets' %}
+
+<swick-combo
+  class="swick-combo"
+  data-combo-cents="{{ combo_cents }}"
+  data-money-format="{{ shop.money_format | strip_html | escape }}"
+  data-count-label="{{ s.count_label | escape }}"
+  data-done-label="{{ s.done_label | escape }}"
+  data-missing-label="{{ s.missing_label | escape }}"
+  data-save-label="{{ s.save_label | escape }}"
+  data-added-label="{{ s.added_label | escape }}"
+  data-error-label="{{ s.error_label | escape }}"
+>
+  <header class="swick-combo__head">
+    {%- if s.eyebrow != blank -%}
+      <p class="swick-combo__eyebrow">{{ s.eyebrow | escape }}</p>
+    {%- endif -%}
+    <h1 class="swick-combo__title">{{ heading | escape }}</h1>
+    <p class="swick-combo__offer">
+      <span class="swick-combo__offer-count">{{ s.offer_prefix | escape }} {{ step_count }}</span>
+      <span class="swick-combo__offer-for">{{ s.offer_joiner | escape }}</span>
+      <span class="swick-combo__offer-price">{{ combo_cents | money_without_trailing_zeros }}</span>
+    </p>
+    {%- if s.description != blank -%}
+      <div class="swick-combo__desc">{{ s.description }}</div>
+    {%- endif -%}
+  </header>
+
+  {%- if step_count == 0 -%}
+    <p class="swick-combo__empty">{{ s.no_steps_label | escape }}</p>
+  {%- else -%}
+    <form
+      action="{{ routes.cart_add_url }}"
+      method="post"
+      class="swick-combo__form"
+      id="SwickCombo-{{ section.id }}"
+      data-swick-combo-form
+    >
+      <ol class="swick-combo__steps">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign i = forloop.index0
+            assign col = block.settings.collection
+            assign step_title = block.settings.title | default: col.title
+          -%}
+          <li class="swick-combo__step" id="SwickComboStep-{{ section.id }}-{{ i }}" data-swick-combo-step="{{ i }}" {{ block.shopify_attributes }}>
+            <fieldset class="swick-combo__fieldset">
+              <legend class="swick-combo__legend">
+                <span class="swick-combo__num" aria-hidden="true">
+                  <span class="swick-combo__num-n">{{ forloop.index }}</span>
+                  <span class="swick-combo__num-done">{%- render 'swick-icon', icon: 'check' -%}</span>
+                </span>
+                <span class="swick-combo__legend-text">
+                  <span class="swick-visually-hidden">{{ s.step_label | escape }} {{ forloop.index }}:</span>
+                  {{ step_title | escape }}
+                </span>
+                <span class="swick-combo__picked" data-swick-combo-picked aria-hidden="true"></span>
+              </legend>
+              {%- if block.settings.note != blank -%}
+                <p class="swick-combo__note">{{ block.settings.note | escape }}</p>
+              {%- endif -%}
+
+              <input type="hidden" name="items[{{ i }}][quantity]" value="1">
+              {%- if s.combo_tag != blank -%}
+                <input type="hidden" name="items[{{ i }}][properties][_combo]" value="{{ s.combo_tag | escape }}">
+              {%- endif -%}
+
+              {%- if col != blank and col.products_count > 0 -%}
+                <div class="swick-combo__rail">
+                  {%- for product in col.products limit: block.settings.limit -%}
+                    {%- liquid
+                      assign variant = product.selected_or_first_available_variant
+                      assign multi = true
+                      if product.has_only_default_variant or product.variants.size == 1
+                        assign multi = false
+                      endif
+                      assign opt_id = 'SwickComboOpt-' | append: section.id | append: '-' | append: i | append: '-' | append: forloop.index
+                    -%}
+                    <div class="swick-combo__opt{% unless product.available %} is-soldout{% endunless %}">
+                      <input
+                        type="radio"
+                        class="swick-combo__radio"
+                        id="{{ opt_id }}"
+                        name="items[{{ i }}][id]"
+                        value="{{ variant.id }}"
+                        data-price="{{ variant.price }}"
+                        data-title="{{ product.title | escape }}"
+                        {% if product.featured_media %}
+                          data-image="{{ product.featured_media.preview_image | image_url: width: 160 }}"
+                        {% endif %}
+                        required
+                        {% unless product.available %}
+                          disabled
+                        {% endunless %}
+                      >
+                      <label for="{{ opt_id }}" class="swick-combo__card">
+                        <span class="swick-combo__media">
+                          {%- if product.featured_media -%}
+                            {{
+                              product.featured_media.preview_image
+                              | image_url: width: 480
+                              | image_tag:
+                                widths: '200, 300, 400, 480',
+                                sizes: '(min-width: 990px) 200px, (min-width: 750px) 25vw, 42vw',
+                                loading: 'lazy',
+                                alt: '',
+                                class: 'swick-combo__img'
+                            }}
+                          {%- else -%}
+                            {{ 'product-1' | placeholder_svg_tag: 'swick-combo__img swick-combo__img--svg' }}
+                          {%- endif -%}
+                          <span class="swick-combo__tick" aria-hidden="true">{%- render 'swick-icon', icon: 'check' -%}</span>
+                        </span>
+                        <span class="swick-combo__name">{{ product.title | escape }}</span>
+                        <span class="swick-combo__price" data-swick-combo-price>
+                          {%- if product.available -%}
+                            {{ variant.price | money_without_trailing_zeros }}
+                          {%- else -%}
+                            {{ 'products.product.sold_out' | t }}
+                          {%- endif -%}
+                        </span>
+                      </label>
+                      {%- if multi and product.available -%}
+                        <select
+                          class="swick-combo__variant"
+                          aria-label="{{ s.variant_label | escape }}: {{ product.title | escape }}"
+                          data-swick-combo-variant="{{ opt_id }}"
+                        >
+                          {%- for v in product.variants -%}
+                            <option
+                              value="{{ v.id }}"
+                              data-price="{{ v.price }}"
+                              {% if v.id == variant.id %}
+                                selected
+                              {% endif %}
+                              {% unless v.available %}
+                                disabled
+                              {% endunless %}
+                            >
+                              {{ v.title | escape }}
+                            </option>
+                          {%- endfor -%}
+                        </select>
+                      {%- endif -%}
+                    </div>
+                  {%- endfor -%}
+                </div>
+              {%- else -%}
+                <div class="swick-combo__rail swick-combo__rail--placeholder" aria-hidden="true">
+                  {%- for n in (1..4) -%}
+                    <div class="swick-combo__opt">
+                      <span class="swick-combo__card">
+                        <span class="swick-combo__media swick-combo__media--ph">
+                          {%- render 'swick-icon', icon: 'bottle', class: 'swick-combo__ph-icon' -%}
+                        </span>
+                        <span class="swick-combo__name">{{ s.placeholder_product | escape }}</span>
+                        <span class="swick-combo__price">—</span>
+                      </span>
+                    </div>
+                  {%- endfor -%}
+                </div>
+                <p class="swick-combo__note">{{ s.no_collection_label | escape }}</p>
+              {%- endif -%}
+            </fieldset>
+          </li>
+        {%- endfor -%}
+      </ol>
+
+      <div class="swick-combo__bar">
+        <ol class="swick-combo__picks" aria-label="{{ s.tray_label | escape }}">
+          {%- for block in section.blocks -%}
+            <li>
+              <button
+                type="button"
+                class="swick-combo__pick"
+                data-swick-combo-pick="{{ forloop.index0 }}"
+                aria-label="{{ s.step_label | escape }} {{ forloop.index }}"
+              >
+                <span class="swick-combo__pick-n" aria-hidden="true">{{ forloop.index }}</span>
+              </button>
+            </li>
+          {%- endfor -%}
+        </ol>
+        <div class="swick-combo__sum">
+          <span class="swick-combo__count" data-swick-combo-count>
+            {{- s.count_label | replace: '[count]', '0' | replace: '[total]', step_count -}}
+          </span>
+          <span class="swick-combo__total">
+            <strong>{{ combo_cents | money_without_trailing_zeros }}</strong>
+            <s class="swick-combo__was" data-swick-combo-was hidden></s>
+          </span>
+        </div>
+        <button type="submit" class="swick-combo__cta" data-swick-combo-submit>
+          <span class="swick-combo__cta-label">{{ s.button_label | escape }}</span>
+          {%- render 'swick-icon', icon: 'bag' -%}
+        </button>
+        <p class="swick-visually-hidden" role="status" aria-live="polite" data-swick-combo-status></p>
+      </div>
+    </form>
+  {%- endif -%}
+</swick-combo>
+
+{% stylesheet %}
+  .swick-combo {
+    --swick-combo-olive: #617246;
+    --swick-combo-olive-soft: #eef1e8;
+    --swick-combo-bar-offset: 0px;
+
+    display: block;
+    max-width: 1100px;
+    margin-inline: auto;
+    padding: 20px var(--swick-gutter, 16px) 0;
+    color: var(--swick-ink, #111);
+  }
+
+  /* Lift the sticky tray above the floating bottom nav on mobile. */
+  @media screen and (max-width: 749px) {
+    body:has(.swick-bnav) .swick-combo {
+      --swick-combo-bar-offset: calc(84px + env(safe-area-inset-bottom));
+    }
+  }
+
+  .swick-combo__head {
+    text-align: center;
+    padding-block-end: 8px;
+  }
+
+  .swick-combo__eyebrow {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--swick-combo-olive);
+  }
+
+  .swick-combo__title {
+    margin: 0;
+    font-size: clamp(26px, 7vw, 40px);
+    font-weight: 300;
+    line-height: 1.1;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .swick-combo__offer {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    margin: 12px 0 0;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background-color: var(--swick-combo-olive);
+    color: #fff;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .swick-combo__offer-count,
+  .swick-combo__offer-price {
+    font-weight: 700;
+  }
+
+  .swick-combo__offer-price {
+    font-size: 20px;
+  }
+
+  .swick-combo__desc {
+    max-width: 52ch;
+    margin: 12px auto 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--swick-muted, #6b6b6b);
+  }
+
+  .swick-combo__desc p {
+    margin: 0;
+  }
+
+  .swick-combo__empty {
+    padding: 32px 0;
+    text-align: center;
+    color: var(--swick-muted, #6b6b6b);
+  }
+
+  .swick-combo__steps {
+    display: grid;
+    gap: 28px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .swick-combo__step {
+    min-width: 0;
+    scroll-margin-block-start: calc(var(--header-height, 60px) + 16px);
+  }
+
+  .swick-combo__fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .swick-combo__legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin: 0 0 12px;
+    padding: 0;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .swick-combo__num {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 1.5px solid var(--swick-combo-olive);
+    border-radius: 50%;
+    color: var(--swick-combo-olive);
+    font-size: 14px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .swick-combo__num-done {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .swick-combo__num-done svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.2;
+  }
+
+  .swick-combo__step.is-done .swick-combo__num {
+    background-color: var(--swick-combo-olive);
+    color: #fff;
+  }
+
+  .swick-combo__step.is-done .swick-combo__num-n {
+    opacity: 0;
+  }
+
+  .swick-combo__step.is-done .swick-combo__num-done {
+    opacity: 1;
+    transform: none;
+  }
+
+  .swick-combo__legend-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .swick-combo__picked {
+    max-width: 40%;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    text-transform: none;
+    letter-spacing: 0;
+    white-space: nowrap;
+    color: var(--swick-combo-olive);
+  }
+
+  .swick-combo__note {
+    margin: -4px 0 12px;
+    font-size: 13px;
+    color: var(--swick-muted, #6b6b6b);
+  }
+
+  .swick-combo__rail {
+    display: grid;
+    grid-auto-columns: minmax(0, 42%);
+    grid-auto-flow: column;
+    gap: 12px;
+    margin-inline: calc(-1 * var(--swick-gutter, 16px));
+    padding: 4px var(--swick-gutter, 16px) 8px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-padding-inline: var(--swick-gutter, 16px);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .swick-combo__rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .swick-combo__opt {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .swick-combo__radio {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .swick-combo__card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  .swick-combo__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    background-color: var(--swick-soft, #f2f2f2);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .swick-combo__media--ph {
+    display: grid;
+    place-items: center;
+    color: #b9bfb0;
+  }
+
+  .swick-combo__ph-icon {
+    width: 40%;
+    height: 40%;
+  }
+
+  .swick-combo__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .swick-combo__tick {
+    position: absolute;
+    inset-block-start: 8px;
+    inset-inline-end: 8px;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--swick-combo-olive);
+    color: #fff;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .swick-combo__tick svg {
+    width: 15px;
+    height: 15px;
+    stroke-width: 2.4;
+  }
+
+  .swick-combo__radio:checked + .swick-combo__card .swick-combo__media {
+    border-color: var(--swick-combo-olive);
+    box-shadow: 0 0 0 3px rgb(97 114 70 / 0.15);
+  }
+
+  .swick-combo__radio:checked + .swick-combo__card .swick-combo__tick {
+    opacity: 1;
+    transform: none;
+  }
+
+  .swick-combo__radio:focus-visible + .swick-combo__card .swick-combo__media {
+    outline: 2px solid var(--swick-combo-olive);
+    outline-offset: 3px;
+  }
+
+  .swick-combo__name {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow-wrap: anywhere;
+  }
+
+  .swick-combo__price {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .swick-combo__opt.is-soldout .swick-combo__card {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .swick-combo__variant {
+    width: 100%;
+    min-height: 36px;
+    padding: 0 28px 0 10px;
+    border: 1px solid var(--swick-line, #e4e4e4);
+    border-radius: 999px;
+    background: #fff
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23617246' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+      no-repeat right 10px center / 14px;
+    font: inherit;
+    font-size: 13px;
+    color: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  [dir='rtl'] .swick-combo__variant {
+    padding: 0 10px 0 28px;
+    background-position: left 10px center;
+  }
+
+  .swick-combo__variant:focus-visible {
+    outline: 2px solid var(--swick-combo-olive);
+    outline-offset: 2px;
+  }
+
+  /* Sticky tray: picks, running total and the add button. */
+  .swick-combo__bar {
+    position: sticky;
+    inset-block-end: var(--swick-combo-bar-offset);
+    z-index: 4;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px 12px;
+    margin: 28px calc(-1 * var(--swick-gutter, 16px)) 0;
+    padding: 12px var(--swick-gutter, 16px) 14px;
+    border-block-start: 1px solid var(--swick-line, #e4e4e4);
+    background-color: rgb(255 255 255 / 0.94);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .swick-combo__picks {
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .swick-combo__pick {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    overflow: hidden;
+    padding: 0;
+    border: 1.5px dashed #c4cbb8;
+    border-radius: 10px;
+    background-color: var(--swick-combo-olive-soft);
+    color: var(--swick-combo-olive);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .swick-combo__pick.is-filled {
+    border-style: solid;
+    border-color: var(--swick-combo-olive);
+    background-color: #fff;
+  }
+
+  .swick-combo__pick img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .swick-combo__pick:focus-visible {
+    outline: 2px solid var(--swick-combo-olive);
+    outline-offset: 2px;
+  }
+
+  .swick-combo__sum {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    min-width: 0;
+    text-align: end;
+  }
+
+  .swick-combo__count {
+    font-size: 12px;
+    color: var(--swick-muted, #6b6b6b);
+  }
+
+  .swick-combo__total {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 6px;
+    font-size: 18px;
+    white-space: nowrap;
+  }
+
+  .swick-combo__count {
+    white-space: nowrap;
+  }
+
+  .swick-combo__was {
+    font-size: 13px;
+    color: var(--swick-muted, #6b6b6b);
+  }
+
+  .swick-combo__cta {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 999px;
+    background-color: var(--swick-combo-olive);
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .swick-combo__cta svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .swick-combo__cta[aria-disabled='true'] {
+    opacity: 0.45;
+  }
+
+  .swick-combo__cta[aria-busy='true'] {
+    opacity: 0.7;
+    cursor: progress;
+  }
+
+  .swick-combo__cta:focus-visible {
+    outline: 2px solid var(--swick-combo-olive);
+    outline-offset: 3px;
+  }
+
+  .swick-combo__step.is-missing .swick-combo__legend {
+    color: #a3402c;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-combo {
+      padding-block-start: 40px;
+      padding-inline: 32px;
+    }
+
+    .swick-combo__rail {
+      grid-auto-columns: minmax(0, 200px);
+      margin-inline: 0;
+      padding-inline: 0;
+    }
+
+    .swick-combo__bar {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      margin-inline: 0;
+      padding-inline: 16px;
+      border: 1px solid var(--swick-line, #e4e4e4);
+      border-radius: 18px 18px 0 0;
+    }
+
+    .swick-combo__cta {
+      grid-column: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .swick-combo *,
+    .swick-combo *::before {
+      transition: none !important;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick combo builder",
+  "tag": "section",
+  "class": "swick-combo-section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shoppers pick one product from each step. The price below is shown to shoppers only — set up a matching discount in Shopify admin (Discounts) so the cart charges the combo price. Every combo line carries the hidden \"_combo\" property below."
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Combo offer"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Leave blank to use the page title.",
+      "default": "Build your combo"
+    },
+    {
+      "type": "number",
+      "id": "combo_price",
+      "label": "Combo price (in store currency)",
+      "default": 999
+    },
+    {
+      "type": "text",
+      "id": "offer_prefix",
+      "label": "Offer text before the count",
+      "default": "Any"
+    },
+    {
+      "type": "text",
+      "id": "offer_joiner",
+      "label": "Offer text before the price",
+      "default": "for"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Pick one from each collection below. Mix a spray, a camphor and an oil — your combo, your way.</p>"
+    },
+    {
+      "type": "text",
+      "id": "combo_tag",
+      "label": "Combo tag",
+      "info": "Saved on each cart line as the hidden \"_combo\" property, so a discount or the order can identify combo items.",
+      "default": "buy-3-for-999"
+    },
+    {
+      "type": "header",
+      "content": "Labels"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button",
+      "default": "Add combo to bag"
+    },
+    {
+      "type": "text",
+      "id": "step_label",
+      "label": "Step",
+      "default": "Step"
+    },
+    {
+      "type": "text",
+      "id": "count_label",
+      "label": "Progress",
+      "info": "Use [count] and [total].",
+      "default": "[count] of [total] picked"
+    },
+    {
+      "type": "text",
+      "id": "done_label",
+      "label": "Combo complete",
+      "default": "Combo ready"
+    },
+    {
+      "type": "text",
+      "id": "missing_label",
+      "label": "Step still empty",
+      "default": "Pick a product for every step first"
+    },
+    {
+      "type": "text",
+      "id": "save_label",
+      "label": "Savings",
+      "info": "Use [amount].",
+      "default": "You save [amount]"
+    },
+    {
+      "type": "text",
+      "id": "added_label",
+      "label": "Added",
+      "default": "Combo added to your bag"
+    },
+    {
+      "type": "text",
+      "id": "error_label",
+      "label": "Error",
+      "default": "Couldn't add the combo. Please try again."
+    },
+    {
+      "type": "text",
+      "id": "variant_label",
+      "label": "Size picker",
+      "default": "Size"
+    },
+    {
+      "type": "text",
+      "id": "tray_label",
+      "label": "Picks tray",
+      "default": "Your combo"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_product",
+      "label": "Placeholder product name",
+      "default": "Your pick"
+    },
+    {
+      "type": "text",
+      "id": "no_collection_label",
+      "label": "Step without a collection",
+      "default": "Products for this step are coming soon."
+    },
+    {
+      "type": "text",
+      "id": "no_steps_label",
+      "label": "No steps",
+      "default": "This combo isn't ready yet."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "info": "Leave blank to use the collection's title.",
+          "default": "Pick a room spray"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "note",
+          "label": "Note"
+        },
+        {
+          "type": "range",
+          "id": "limit",
+          "label": "Products shown",
+          "min": 2,
+          "max": 24,
+          "step": 1,
+          "default": 12
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Swick combo builder",
+      "blocks": [
+        { "type": "step", "settings": { "title": "Pick a room spray" } },
+        { "type": "step", "settings": { "title": "Pick a camphor" } },
+        { "type": "step", "settings": { "title": "Pick an oil" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

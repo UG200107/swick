@@ -1,0 +1,190 @@
+{%- comment -%}
+  Swick — sticky search bar.
+  Sits in the page flow (e.g. right after the trust strip); once scrolled up to the header it sticks
+  just below the logo bar (Horizon keeps --header-height live on <body>) and stays there.
+  A real search form (works without JS). The placeholder gently cycles through example searches.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign suggestions = s.suggestions | split: ','
+-%}
+
+{% render 'swick-assets' %}
+
+{% style %}
+  /* Stick the whole section wrapper so it stays pinned for the rest of the page. */
+  #shopify-section-{{ section.id }} {
+    position: sticky;
+    top: calc(var(--header-height, 60px) - 1px);
+    z-index: var(--layer-sticky, 8);
+  }
+{% endstyle %}
+
+<swick-search-bar class="swick-search" data-suggestions="{{ suggestions | join: '|' | escape }}">
+  <form action="{{ routes.search_url }}" method="get" role="search" class="swick-search__form">
+    <label for="SwickSearch-{{ section.id }}" class="swick-visually-hidden">{{ 'content.search' | t }}</label>
+    <span class="swick-search__icon" aria-hidden="true">
+      {%- render 'swick-icon', icon: 'search' -%}
+    </span>
+    <input
+      id="SwickSearch-{{ section.id }}"
+      class="swick-search__input"
+      type="search"
+      name="q"
+      value="{{ search.terms | escape }}"
+      placeholder="{{ s.placeholder | escape }}"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+      enterkeyhint="search"
+      data-swick-search-input
+    >
+    <input type="hidden" name="options[prefix]" value="last">
+    <button type="submit" class="swick-search__submit" aria-label="{{ 'content.search' | t | escape }}">
+      {%- render 'swick-icon', icon: 'chevron-right' -%}
+    </button>
+  </form>
+</swick-search-bar>
+
+{% stylesheet %}
+  .swick-search {
+    display: block;
+    padding: 10px var(--swick-gutter, 16px);
+    background-color: rgb(255 255 255 / 0.96);
+    transition: box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  /* Once stuck under the header: a soft shadow separates it from the scrolling page. */
+  .swick-search.is-stuck {
+    box-shadow: 0 6px 14px -8px rgb(0 0 0 / 0.18);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    background-color: rgb(255 255 255 / 0.9);
+  }
+
+  .swick-search__form {
+    position: relative;
+    display: flex;
+    align-items: center;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  .swick-search__icon {
+    position: absolute;
+    inset-inline-start: 14px;
+    display: grid;
+    place-items: center;
+    color: #617246;
+    pointer-events: none;
+  }
+
+  .swick-search__icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .swick-search__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 44px;
+    padding: 0 48px 0 42px;
+    border: 1px solid #e1e6d8;
+    border-radius: 999px;
+    background-color: #f3f5ef;
+    font-family: var(--font-body--family);
+    font-size: 16px; /* 16px stops iOS zooming in on focus */
+    font-weight: 400;
+    color: var(--swick-ink, #111);
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .swick-search__input::placeholder {
+    color: #7c8473;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+  }
+
+  .swick-search__input.is-swapping::placeholder {
+    opacity: 0;
+  }
+
+  .swick-search__input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+
+  .swick-search__input:focus {
+    outline: none;
+    border-color: #617246;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgb(97 114 70 / 0.18);
+  }
+
+  .swick-search__submit {
+    position: absolute;
+    inset-inline-end: 4px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: #617246;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .swick-search__submit svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .swick-search__submit:focus-visible {
+    outline: 2px solid #617246;
+    outline-offset: 2px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-search {
+      padding-block: 12px;
+      padding-inline: 48px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick search bar",
+  "tag": "section",
+  "class": "swick-search-section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Sticks just below the header once the page scrolls to it."
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder",
+      "default": "Search for fragrances, camphor, sprays…"
+    },
+    {
+      "type": "text",
+      "id": "suggestions",
+      "label": "Rotating examples",
+      "info": "Comma-separated. The placeholder cycles through these. Leave blank to keep it fixed.",
+      "default": "Search \"lavender room spray\",Search \"bhimseni camphor\",Search \"jasmine\",Search \"linen spray\",Search \"temple fragrance\""
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick search bar"
+    }
+  ]
+}
+{% endschema %}

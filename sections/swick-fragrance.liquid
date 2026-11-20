@@ -1,0 +1,478 @@
+{%- comment -%}
+  Swick — "Shop by Fragrance".
+  A stage shows the selected fragrance: an animated illustration that grows from the ground
+  (or an uploaded photo that rises in), its name, notes, a short line and a shop button.
+  Pill buttons underneath switch fragrance and replay the animation.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+-%}
+
+{% render 'swick-assets' %}
+
+<swick-fragrance class="swick-frag">
+  {%- if s.heading_light != blank or s.heading_bold != blank -%}
+    <div class="swick-frag__head">
+      <h2 class="swick-title">
+        {%- if s.heading_light != blank -%}<span class="swick-title__light">{{ s.heading_light | escape }}</span>{%- endif -%}
+        {%- if s.heading_bold != blank -%}<span class="swick-title__bold">{{ s.heading_bold | escape }}</span>{%- endif -%}
+      </h2>
+    </div>
+  {%- endif -%}
+
+  <div class="swick-frag__stage">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign b = block.settings
+        assign url = b.link | default: b.collection.url | default: routes.all_products_collection_url
+      -%}
+      <div
+        class="swick-frag__scene{% if forloop.first %} is-current{% endif %}{% if b.image == blank and b.illustration contains 'art-' %} swick-frag__scene--art{% endif %}{% if b.show_ground %} has-ground{% endif %}"
+        id="SwickFragScene-{{ section.id }}-{{ forloop.index }}"
+        role="tabpanel"
+        aria-labelledby="SwickFragTab-{{ section.id }}-{{ forloop.index }}"
+        data-frag-scene
+        style="--frag-tint: {{ b.tint }}; --frag-accent: {{ b.accent }}; --ground-1: {{ b.ground_1 }}; --ground-2: {{ b.ground_2 }}; --ground-3: {{ b.ground_3 }};"
+        {% unless forloop.first %}
+          aria-hidden="true" inert
+        {% endunless %}
+        {{ block.shopify_attributes }}
+      >
+        {%- if b.show_ground -%}
+          <div class="sfx-ground{% if b.ground_shape == 'meadow' %} meadow-ground{% endif %}" aria-hidden="true">{%- render 'swick-frag-ground', shape: b.ground_shape -%}</div>
+        {%- endif -%}
+        <div class="swick-frag__art">
+          {%- if b.image != blank -%}
+            {{
+              b.image
+              | image_url: width: 1000
+              | image_tag:
+                widths: '400, 600, 800, 1000',
+                sizes: '(min-width: 750px) 50vw, 90vw',
+                loading: 'lazy',
+                alt: b.image.alt,
+                class: 'swick-frag__img sfa-a sfa-rise'
+            }}
+          {%- else -%}
+            {%- render 'swick-fragrance-art', type: b.illustration -%}
+          {%- endif -%}
+        </div>
+
+        <div class="swick-frag__info">
+          <h3 class="swick-frag__name">{{ b.name | escape }}</h3>
+          {%- if b.notes != blank -%}
+            <p class="swick-frag__notes">{{ b.notes | escape }}</p>
+          {%- endif -%}
+          {%- if b.description != blank -%}
+            <p class="swick-frag__desc">{{ b.description | escape }}</p>
+          {%- endif -%}
+          {%- if s.cta_prefix != blank -%}
+            <a href="{{ url }}" class="swick-frag__cta">
+              {{- s.cta_prefix | escape }} {{ b.name | escape -}}
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <div class="swick-frag__chips" role="tablist" aria-label="{{ s.heading_bold | default: 'Fragrances' | escape }}">
+    {%- for block in section.blocks -%}
+      <button
+        type="button"
+        role="tab"
+        class="swick-frag__chip"
+        id="SwickFragTab-{{ section.id }}-{{ forloop.index }}"
+        aria-controls="SwickFragScene-{{ section.id }}-{{ forloop.index }}"
+        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+        tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+        style="--frag-accent: {{ block.settings.accent }};"
+      >
+        <span class="swick-frag__dot" aria-hidden="true"></span>
+        {{- block.settings.name | escape -}}
+      </button>
+    {%- endfor -%}
+  </div>
+</swick-fragrance>
+
+{% stylesheet %}
+  .swick-frag {
+    display: block;
+    padding-block: 28px 32px;
+    background-color: var(--swick-surface, #fff);
+  }
+
+  .swick-frag__head {
+    padding-inline: var(--swick-gutter, 16px);
+    padding-block-end: 16px;
+  }
+
+  /* ---------- Stage: scenes stacked in one cell, cross-fading ---------- */
+  .swick-frag__stage {
+    display: grid;
+    margin-inline: var(--swick-gutter, 16px);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .swick-frag__scene {
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    min-height: 0;
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background:
+      radial-gradient(120% 80% at 50% 100%, rgb(255 255 255 / 0.55) 0%, transparent 60%),
+      var(--frag-tint, #f1f4ea);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+  }
+
+  .swick-frag__scene.is-current {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.45s ease;
+  }
+
+  .swick-frag__info {
+    grid-row: 1;
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 18px 18px 0;
+    z-index: 1;
+  }
+
+  .swick-frag__art {
+    grid-row: 2;
+    position: relative;
+    min-height: 0;
+    padding: 0 6% 4%;
+  }
+
+  /* Your layered artwork: fills the whole stage behind the text. */
+  .swick-frag__scene--art .swick-frag__art {
+    grid-row: 1 / -1;
+    grid-column: 1 / -1;
+    padding: 0;
+    z-index: 0;
+  }
+
+  .swick-frag__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+  }
+
+  .swick-frag__name {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--swick-ink, #111);
+  }
+
+  .swick-frag__notes {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--frag-accent, #617246);
+  }
+
+  .swick-frag__desc {
+    margin: 2px 0 0;
+    max-width: 34ch;
+    font-family: var(--font-body--family);
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--swick-ink-soft, #3a3a3a);
+  }
+
+  .swick-frag__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    margin-block-start: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background-color: #617246;
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .swick-frag__cta:focus-visible {
+    outline: 2px solid #617246;
+    outline-offset: 3px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-frag__head {
+      padding-inline: 48px;
+    }
+
+    .swick-frag__stage {
+      margin-inline: 48px;
+      border-radius: 28px;
+    }
+
+    .swick-frag__scene {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      grid-template-rows: 1fr;
+      aspect-ratio: 16 / 7;
+    }
+
+    .swick-frag__info {
+      grid-row: 1;
+      grid-column: 1;
+      justify-content: center;
+      padding: 32px 0 32px 56px;
+    }
+
+    .swick-frag__art {
+      grid-row: 1;
+      grid-column: 2;
+      padding: 24px 40px 18px 0;
+    }
+
+    .swick-frag__name {
+      font-size: 34px;
+    }
+
+    .swick-frag__notes {
+      font-size: 12px;
+    }
+
+    .swick-frag__desc {
+      font-size: 15px;
+    }
+
+    .swick-frag__cta {
+      font-size: 14px;
+      padding: 10px 20px;
+    }
+  }
+
+  /* ---------- Fragrance buttons ---------- */
+  /* All fragrances visible at once: buttons wrap onto as many lines as needed. */
+  .swick-frag__chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px var(--swick-gutter, 16px) 4px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-frag__chips {
+      gap: 10px;
+      padding-inline: 48px;
+    }
+  }
+
+  .swick-frag__chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 14px 8px 11px;
+    border: 1px solid var(--swick-line, #e4e4e4);
+    border-radius: 999px;
+    background-color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--swick-ink, #111);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .swick-frag__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--frag-accent, #617246);
+    box-shadow: 0 0 0 2px rgb(255 255 255 / 0.8);
+  }
+
+  .swick-frag__chip[aria-selected='true'] {
+    border-color: #617246;
+    background-color: #617246;
+    color: #fff;
+  }
+
+  .swick-frag__chip:focus-visible {
+    outline: 2px solid #617246;
+    outline-offset: 2px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick shop by fragrance",
+  "tag": "section",
+  "class": "swick-frag-section",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_light",
+      "label": "Heading (light line)",
+      "default": "Shop by"
+    },
+    {
+      "type": "text",
+      "id": "heading_bold",
+      "label": "Heading (bold line)",
+      "default": "Fragrance"
+    },
+    {
+      "type": "text",
+      "id": "cta_prefix",
+      "label": "Button text",
+      "info": "Followed by the fragrance name, e.g. Shop French Lavender. Leave blank to hide.",
+      "default": "Shop"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "fragrance",
+      "name": "Fragrance",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "French Lavender"
+        },
+        {
+          "type": "text",
+          "id": "notes",
+          "label": "Notes",
+          "default": "Herbal · Floral · Calming"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Short line",
+          "default": "Soft, herbal and calming, made for slow evenings."
+        },
+        {
+          "type": "select",
+          "id": "illustration",
+          "label": "Animated illustration",
+          "info": "Plays when the fragrance is selected. Ignored if an image is set.",
+          "options": [
+            { "value": "lavender", "label": "Lavender (stalks grow, buds pop)" },
+            { "value": "rose", "label": "Rose (stem grows, rose blooms)" },
+            { "value": "jasmine", "label": "Jasmine (vine climbs, flowers open)" },
+            { "value": "sandalwood", "label": "Sandalwood (tree grows, aroma rises)" },
+            { "value": "ocean", "label": "Ocean breeze (waves roll in)" },
+            { "value": "sprig", "label": "Leafy sprig (any other fragrance)" },
+            { "value": "art-lavender", "label": "Lavender: your artwork" },
+            { "value": "art-jasmine", "label": "Jasmine: your artwork" }
+          ],
+          "default": "lavender"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_ground",
+          "label": "Show hills / soil",
+          "info": "Reusable ground along the bottom of the stage. The plant grows on top of it.",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "ground_shape",
+          "label": "Ground shape",
+          "options": [
+            { "value": "hills", "label": "Hills (3 bands)" },
+            { "value": "meadow", "label": "Meadow (4 bands)" }
+          ],
+          "default": "hills"
+        },
+        {
+          "type": "color",
+          "id": "ground_1",
+          "label": "Ground: back hills",
+          "default": "#AAA2CC"
+        },
+        {
+          "type": "color",
+          "id": "ground_2",
+          "label": "Ground: middle hills",
+          "default": "#8E82BA"
+        },
+        {
+          "type": "color",
+          "id": "ground_3",
+          "label": "Ground: front soil",
+          "default": "#5F538E"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (optional)",
+          "info": "A transparent cut-out works best; it rises into place instead of the illustration."
+        },
+        {
+          "type": "color",
+          "id": "tint",
+          "label": "Stage tint",
+          "default": "#EEEAF6"
+        },
+        {
+          "type": "color",
+          "id": "accent",
+          "label": "Accent (button dot and notes)",
+          "default": "#7D68C0"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Overrides the collection link."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick shop by fragrance",
+      "blocks": [
+        { "type": "fragrance", "settings": { "name": "French Lavender", "notes": "Herbal · Floral · Calming", "description": "Soft, herbal and calming, made for slow evenings.", "illustration": "lavender", "tint": "#EEEAF6", "accent": "#7D68C0" } },
+        { "type": "fragrance", "settings": { "name": "Royal Rose", "notes": "Floral · Velvety · Romantic", "description": "A full, velvety rose that makes any room feel special.", "illustration": "rose", "tint": "#F8E9EC", "accent": "#C9475F" } },
+        { "type": "fragrance", "settings": { "name": "Jasmine Bloom", "notes": "Sweet · Fresh · Uplifting", "description": "Night-blooming jasmine, bright and gently sweet.", "illustration": "jasmine", "tint": "#F1F4EA", "accent": "#8A9A5B" } },
+        { "type": "fragrance", "settings": { "name": "Sandalwood", "notes": "Woody · Creamy · Grounding", "description": "Warm, creamy sandalwood for calm, grounded spaces.", "illustration": "sandalwood", "tint": "#F4ECE3", "accent": "#9A6B47" } },
+        { "type": "fragrance", "settings": { "name": "Ocean Breeze", "notes": "Fresh · Airy · Clean", "description": "A clean sea breeze that opens up any room.", "illustration": "ocean", "tint": "#E7F2F4", "accent": "#3F8EA3" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

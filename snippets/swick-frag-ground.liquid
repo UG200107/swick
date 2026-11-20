@@ -1,0 +1,29 @@
+{%- doc -%}
+  Reusable ground for the "Shop by Fragrance" stage, independent of any plant so it never has holes
+  where a plant will grow. Rises in back-to-front with the scene (classes sfa-a / sfx-hill).
+
+  Shapes (both on the designers' 1600x1800 canvas, soil line around y 1560-1610):
+  - hills  : 3 bands (from the French Lavender artwork)
+  - meadow : 4 bands (from the Jasmine Bloom artwork); the far pale band uses --ground-0
+  Colours: --ground-1 (back), --ground-2 (middle), --ground-3 (front soil).
+
+  @param {string} [shape] - hills (default) | meadow
+
+  @example
+  {% render 'swick-frag-ground', shape: 'meadow' %}
+{%- enddoc -%}
+
+{%- if shape == 'meadow' -%}
+<svg class="sfx-ground-svg" viewBox="0 1100 1600 700" aria-hidden="true" focusable="false" preserveAspectRatio="none">
+  <path class="sfa-a sfx-hill" style="--d: 0.00s; fill: var(--ground-0, #f6fbe1);" d="M0 1800L0 1231L24 1233L40 1229L184 1150L196 1155L396 1271.7L1160 1151.5L1208 1139L1336 1222L1352 1234L1396 1275L1416 1288L1488 1326L1572 1376L1600 1371L1600 1800Z"/>
+  <path class="sfa-a sfx-hill" style="--d: 0.10s; fill: var(--ground-1, #c0ce8c);" d="M0 1800L0 1231L28 1235L64 1249L132 1286L172 1314L224 1338L340 1383L380 1391L396 1391.6L1208 1284L1448 1370L1508 1386L1600 1372L1600 1800Z"/>
+  <path class="sfa-a sfx-hill" style="--d: 0.20s; fill: var(--ground-2, #77844a);" d="M0 1800L0 1578L192 1530L364 1477L388 1457L396 1453L1212 1440L1380 1409L1600 1372L1600 1800Z"/>
+  <path class="sfa-a sfx-hill" style="--d: 0.30s; fill: var(--ground-3, #475122);" d="M0 1800L0 1616L76 1636L172 1651L192 1650L252 1631L312 1620L340 1620L372 1626L396 1623.1L1212 1638L1324 1621L1416 1610L1600 1567L1600 1800Z"/>
+</svg>
+{%- else -%}
+<svg class="sfx-ground-svg" viewBox="0 1340 1600 460" aria-hidden="true" focusable="false" preserveAspectRatio="none">
+  <path class="sfa-a sfx-hill" style="--d: 0.00s; fill: var(--ground-1, #aaa2cc);" d="M0 1800L0 1437L12 1434L104 1437L204 1383L208 1383L424 1511L432 1515L464 1518L580 1478L636 1492.6L804 1430L832 1406L896 1382L936 1407L1016 1469L1128 1533L1168 1527L1216 1525L1236 1528L1264 1539L1320 1522L1396 1483L1448 1463L1480 1437L1536 1397L1584 1371L1600 1366L1600 1800Z"/>
+  <path class="sfa-a sfx-hill" style="--d: 0.12s; fill: var(--ground-2, #8e82ba);" d="M0 1800L0 1439L8 1436L64 1436L108 1442L156 1465L196 1492L216 1502L316 1541L348 1545L392 1546L400 1544L472 1516L580 1479L636 1493.9L812 1473.2L1000 1513.6L1044 1529L1088 1541L1184 1526L1220 1526L1244 1531L1268 1540L1312 1525L1400 1518L1600 1556L1600 1800Z"/>
+  <path class="sfa-a sfx-hill" style="--d: 0.24s; fill: var(--ground-3, #5f538e);" d="M0 1800L0 1647L48 1678L200 1640L356 1592L388 1592L432 1601L492 1592L520 1599L568 1592L636 1565L1004 1556L1068 1544L1188 1526L1216 1526L1252 1534L1364 1593L1440 1630L1492 1637L1556 1642L1600 1625L1600 1800Z"/>
+</svg>
+{%- endif -%}

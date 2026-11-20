@@ -1,7 +1,7 @@
 {%- doc -%}
   Thin-stroke (1.5px) monochrome icon set for Swick sections. Decorative: always aria-hidden.
 
-  @param {string} icon - heart | plus | chevron-left | chevron-right | home | menu | new | bag | store | search | user | bottle | camphor | spray | linen | diya | oil | leaf | gift | percent | return | truck | bed | bath | sofa | car
+  @param {string} icon - heart | plus | chevron-left | chevron-right | home | menu | new | bag | store | search | user | bottle | camphor | spray | linen | diya | oil | leaf | gift | percent | return | truck | bed | bath | sofa | car | check | close
   @param {string} [class] - Extra class for the svg element.
 
   @example
@@ -72,6 +72,10 @@
       <path d="M4.5 9A8 8 0 1 1 4 13.5"/><path d="M4.5 4.5V9H9"/><path d="m12 8 3.5 2v4L12 16l-3.5-2v-4L12 8Z"/><path d="m8.5 10 3.5 2 3.5-2M12 12v4"/>
     {%- when 'truck' -%}
       <path d="M2.5 6.5h11v9h-11z"/><path d="M13.5 9.5h4l3 3.5v2.5h-7"/><circle cx="6.5" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/>
+    {%- when 'check' -%}
+      <path d="m5 12.5 4.5 4.5L19 7.5"/>
+    {%- when 'close' -%}
+      <path d="M6 6l12 12M18 6 6 18"/>
     {%- else -%}
       <path d="M5 19C5 11 10 5.5 19 5c0 9-5 14-14 14Z"/><path d="m5 19 7.5-7.5"/>
   {%- endcase -%}

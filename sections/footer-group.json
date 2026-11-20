@@ -227,7 +227,7 @@
             "label": "Offers",
             "icon": "gift",
             "action": "link",
-            "link": "shopify://collections/all"
+            "link": "/pages/contact?view=combo"
           }
         }
       },

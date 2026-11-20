@@ -274,17 +274,33 @@ const routeRoot = () => (window.Shopify && window.Shopify.routes && window.Shopi
  * @param {number} [quantity]
  * @returns {Promise<{ok: boolean, message: string}>}
  */
-export async function swickAddToCart(source, variantId, quantity = 1) {
+export function swickAddToCart(source, variantId, quantity = 1) {
+  return swickAddLines(source, [{ id: variantId, quantity }]);
+}
+
+/**
+ * Add several lines in one request (e.g. a combo).
+ * @param {HTMLElement} source
+ * @param {{id: string|number, quantity?: number, properties?: Record<string, string>}[]} lines
+ * @returns {Promise<{ok: boolean, message: string}>}
+ */
+export async function swickAddLines(source, lines) {
   const sectionIds = Array.from(document.querySelectorAll('cart-items-component'))
     .map((el) => el instanceof HTMLElement && el.dataset.sectionId)
     .filter(Boolean);
+  const items = lines.map((line) => ({
+    id: Number(line.id),
+    quantity: line.quantity || 1,
+    ...(line.properties ? { properties: line.properties } : {}),
+  }));
+  const quantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const deferred = CartLinesUpdateEvent.createPromise();
   source.dispatchEvent(
     new CartLinesUpdateEvent({
       action: 'add',
       context: 'product',
-      lines: [{ merchandiseId: String(variantId), quantity }],
+      lines: items.map((item) => ({ merchandiseId: String(item.id), quantity: item.quantity })),
       promise: deferred.promise,
     })
   );
@@ -293,7 +309,7 @@ export async function swickAddToCart(source, variantId, quantity = 1) {
     const response = await fetch(`${routeRoot()}cart/add.js`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ items: [{ id: Number(variantId), quantity }], sections: sectionIds.join(',') }),
+      body: JSON.stringify({ items, sections: sectionIds.join(',') }),
     });
     const data = await response.json();
     const ajaxCart = await (await fetch(`${routeRoot()}cart.js`, { headers: { Accept: 'application/json' } })).json();
@@ -808,6 +824,300 @@ class SwickRecommendations extends HTMLElement {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Shop by Fragrance: pill buttons switch the stage and replay the    */
+/* grow / bloom animation. The first scene plays when scrolled in.    */
+/* ------------------------------------------------------------------ */
+class SwickFragrance extends HTMLElement {
+  connectedCallback() {
+    this.tabs = Array.from(this.querySelectorAll('[role="tab"]'));
+    this.scenes = Array.from(this.querySelectorAll('[data-frag-scene]'));
+    if (!this.tabs.length || !this.scenes.length) return;
+
+    this.classList.add('is-ready');
+    this.index = Math.max(0, this.tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true'));
+
+    this.onClick = (event) => {
+      const tab = event.target.closest('[role="tab"]');
+      if (tab && this.tabs.includes(tab)) this.select(this.tabs.indexOf(tab), true);
+    };
+    this.onKey = (event) => {
+      const i = this.tabs.indexOf(document.activeElement);
+      if (i < 0) return;
+      const last = this.tabs.length - 1;
+      const map = { ArrowRight: i === last ? 0 : i + 1, ArrowLeft: i === 0 ? last : i - 1, Home: 0, End: last };
+      if (!(event.key in map)) return;
+      event.preventDefault();
+      this.select(map[event.key], true);
+      this.tabs[map[event.key]].focus();
+    };
+    this.addEventListener('click', this.onClick);
+    this.addEventListener('keydown', this.onKey);
+
+    // Play the first scene only once the section is actually on screen.
+    if ('IntersectionObserver' in window) {
+      this.io = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            this.play(this.index);
+            this.io.disconnect();
+          }
+        },
+        { threshold: 0.35 }
+      );
+      this.io.observe(this.querySelector('.swick-frag__stage') || this);
+    } else {
+      this.play(this.index);
+    }
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener('click', this.onClick);
+    this.removeEventListener('keydown', this.onKey);
+    this.io?.disconnect();
+  }
+
+  select(i, fromUser) {
+    this.index = i;
+    this.tabs.forEach((tab, n) => {
+      const on = n === i;
+      tab.setAttribute('aria-selected', String(on));
+      tab.tabIndex = on ? 0 : -1;
+    });
+    this.scenes.forEach((scene, n) => {
+      const on = n === i;
+      scene.classList.toggle('is-current', on);
+      scene.toggleAttribute('inert', !on);
+      scene.setAttribute('aria-hidden', String(!on));
+    });
+    if (fromUser) {
+      this.tabs[i].scrollIntoView({ block: 'nearest', inline: 'center', behavior: reducedMotion() ? 'auto' : 'smooth' });
+      this.io?.disconnect();
+    }
+    this.play(i);
+  }
+
+  play(i) {
+    this.scenes.forEach((scene) => scene.classList.remove('is-playing'));
+    const scene = this.scenes[i];
+    if (!scene) return;
+    void scene.offsetWidth; // restart CSS animations even when the same fragrance is tapped again
+    scene.classList.add('is-playing');
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Sticky search bar: marks itself "stuck" once pinned under the       */
+/* header, and gently cycles example searches in the placeholder.     */
+/* ------------------------------------------------------------------ */
+class SwickSearchBar extends HTMLElement {
+  connectedCallback() {
+    this.input = this.querySelector('[data-swick-search-input]');
+    this.section = this.closest('.shopify-section') || this;
+
+    this.onScroll = () => {
+      window.cancelAnimationFrame(this.raf);
+      this.raf = window.requestAnimationFrame(() => {
+        const headerH = parseFloat(getComputedStyle(document.body).getPropertyValue('--header-height')) || 0;
+        const top = this.section.getBoundingClientRect().top;
+        // Stuck = pinned under the header and pulled away from the section above it.
+        const prev = this.section.previousElementSibling;
+        const detached = prev ? prev.getBoundingClientRect().bottom < top - 1 : top <= headerH + 1;
+        this.classList.toggle('is-stuck', top <= headerH + 1 && detached);
+      });
+    };
+    // Capture phase catches both the window scrolling (mobile) and Horizon's .page-wrapper scroller (>= 990px).
+    document.addEventListener('scroll', this.onScroll, { passive: true, capture: true });
+    this.onScroll();
+
+    const list = (this.dataset.suggestions || '').split('|').map((t) => t.trim()).filter(Boolean);
+    if (this.input && list.length > 1 && !reducedMotion()) {
+      this.base = this.input.getAttribute('placeholder') || '';
+      let i = -1;
+      this.timer = window.setInterval(() => {
+        if (document.activeElement === this.input || this.input.value) return;
+        this.input.classList.add('is-swapping');
+        window.setTimeout(() => {
+          i = (i + 1) % list.length;
+          this.input.setAttribute('placeholder', list[i]);
+          this.input.classList.remove('is-swapping');
+        }, 250);
+      }, 2800);
+      this.onFocus = () => this.input.setAttribute('placeholder', this.base);
+      this.input.addEventListener('focus', this.onFocus);
+    }
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('scroll', this.onScroll, { capture: true });
+    window.cancelAnimationFrame(this.raf);
+    if (this.timer) window.clearInterval(this.timer);
+    this.input?.removeEventListener('focus', this.onFocus);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Combo builder — one pick per step, then add every pick at once.    */
+/* ------------------------------------------------------------------ */
+class SwickCombo extends HTMLElement {
+  connectedCallback() {
+    this.form = this.querySelector('[data-swick-combo-form]');
+    if (!(this.form instanceof HTMLFormElement)) return;
+    this.form.noValidate = true; // JS shows its own guidance; without JS the radios' `required` applies
+    this.steps = Array.from(this.querySelectorAll('[data-swick-combo-step]'));
+    this.picks = Array.from(this.querySelectorAll('[data-swick-combo-pick]'));
+    this.count = this.querySelector('[data-swick-combo-count]');
+    this.was = this.querySelector('[data-swick-combo-was]');
+    this.status = this.querySelector('[data-swick-combo-status]');
+    this.submit = this.querySelector('[data-swick-combo-submit]');
+    this.comboCents = Number(this.dataset.comboCents) || 0;
+
+    this.controller = new AbortController();
+    const { signal } = this.controller;
+    this.form.addEventListener('change', (event) => this.onChange(event), { signal });
+    this.form.addEventListener('submit', (event) => this.onSubmit(event), { signal });
+    this.addEventListener('click', (event) => this.onPickClick(event), { signal });
+    this.update();
+  }
+
+  disconnectedCallback() {
+    this.controller?.abort();
+    window.clearTimeout(this.statusTimer);
+  }
+
+  /** @param {Event} event */
+  onChange(event) {
+    const target = event.target;
+    if (target instanceof HTMLSelectElement && target.dataset.swickComboVariant) {
+      // A size change re-points that card's radio at the chosen variant and selects the card.
+      const radio = document.getElementById(target.dataset.swickComboVariant);
+      const option = target.selectedOptions[0];
+      if (radio instanceof HTMLInputElement && option) {
+        radio.value = option.value;
+        radio.dataset.price = option.dataset.price || radio.dataset.price;
+        const price = radio.closest('.swick-combo__opt')?.querySelector('[data-swick-combo-price]');
+        if (price) price.textContent = formatMoney(Number(radio.dataset.price), this.dataset.moneyFormat);
+        radio.checked = true;
+      }
+    }
+    this.update();
+  }
+
+  /** @param {MouseEvent} event */
+  onPickClick(event) {
+    const pick = event.target instanceof Element && event.target.closest('[data-swick-combo-pick]');
+    if (!pick) return;
+    const step = this.steps[Number(pick.getAttribute('data-swick-combo-pick'))];
+    if (!step) return;
+    step.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    const radio = step.querySelector('.swick-combo__radio:checked') || step.querySelector('.swick-combo__radio:not(:disabled)');
+    if (radio instanceof HTMLElement) radio.focus({ preventScroll: true });
+  }
+
+  /** @returns {(HTMLInputElement|null)[]} */
+  selections() {
+    return this.steps.map((step) => {
+      const radio = step.querySelector('.swick-combo__radio:checked');
+      return radio instanceof HTMLInputElement ? radio : null;
+    });
+  }
+
+  update() {
+    const picked = this.selections();
+    let filled = 0;
+    let sum = 0;
+
+    picked.forEach((radio, i) => {
+      const step = this.steps[i];
+      const pick = this.picks[i];
+      step.classList.toggle('is-done', Boolean(radio));
+      if (radio) step.classList.remove('is-missing');
+      const label = step.querySelector('[data-swick-combo-picked]');
+      if (label) label.textContent = radio ? radio.dataset.title || '' : '';
+      if (radio) {
+        filled += 1;
+        sum += Number(radio.dataset.price) || 0;
+      }
+      if (!pick) return;
+      pick.classList.toggle('is-filled', Boolean(radio));
+      pick.querySelector('img')?.remove();
+      if (radio?.dataset.image) {
+        const img = document.createElement('img');
+        img.src = radio.dataset.image;
+        img.alt = '';
+        img.width = 44;
+        img.height = 44;
+        pick.append(img);
+      }
+      const base = pick.getAttribute('aria-label')?.split(':')[0] || '';
+      pick.setAttribute('aria-label', radio ? `${base}: ${radio.dataset.title || ''}` : base);
+    });
+
+    const total = this.steps.length;
+    const complete = filled === total;
+    if (this.count) {
+      this.count.textContent = complete
+        ? this.dataset.doneLabel || ''
+        : (this.dataset.countLabel || '').replace('[count]', String(filled)).replace('[total]', String(total));
+    }
+    if (this.was) {
+      const saving = complete && sum > this.comboCents;
+      this.was.hidden = !saving;
+      this.was.textContent = saving ? formatMoney(sum, this.dataset.moneyFormat) : '';
+    }
+    this.submit?.setAttribute('aria-disabled', String(!complete));
+    return { picked, complete, sum };
+  }
+
+  announce(message) {
+    if (!this.status) return;
+    window.clearTimeout(this.statusTimer);
+    this.status.textContent = message;
+    this.statusTimer = window.setTimeout(() => {
+      if (this.status) this.status.textContent = '';
+    }, 4000);
+  }
+
+  /** @param {SubmitEvent} event */
+  async onSubmit(event) {
+    event.preventDefault();
+    if (!this.submit || this.submit.getAttribute('aria-busy') === 'true') return;
+    const { picked, complete, sum } = this.update();
+
+    if (!complete) {
+      const firstMissing = picked.findIndex((radio) => !radio);
+      picked.forEach((radio, i) => this.steps[i].classList.toggle('is-missing', !radio));
+      const step = this.steps[firstMissing];
+      step?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+      const first = step?.querySelector('.swick-combo__radio:not(:disabled)');
+      if (first instanceof HTMLElement) first.focus({ preventScroll: true });
+      this.announce(this.dataset.missingLabel || '');
+      return;
+    }
+
+    const data = new FormData(this.form);
+    const lines = picked.map((radio, i) => {
+      const tag = data.get(`items[${i}][properties][_combo]`);
+      return { id: radio.value, quantity: 1, ...(tag ? { properties: { _combo: String(tag) } } : {}) };
+    });
+
+    this.submit.setAttribute('aria-busy', 'true');
+    const result = await swickAddLines(this, lines);
+    this.submit.removeAttribute('aria-busy');
+
+    if (!result.ok) {
+      this.announce(result.message || this.dataset.errorLabel || '');
+      return;
+    }
+    const saving = sum > this.comboCents ? sum - this.comboCents : 0;
+    const saveText = saving
+      ? ` · ${(this.dataset.saveLabel || '').replace('[amount]', formatMoney(saving, this.dataset.moneyFormat))}`
+      : '';
+    this.announce(`${this.dataset.addedLabel || ''}${saveText}`);
+    openCartDrawer();
+  }
+}
+
 const define = (name, ctor) => {
   if (!customElements.get(name)) customElements.define(name, ctor);
 };
@@ -821,3 +1131,6 @@ define('swick-bottom-nav', SwickBottomNav);
 define('swick-product', SwickProduct);
 define('swick-pincode', SwickPincode);
 define('swick-recommendations', SwickRecommendations);
+define('swick-fragrance', SwickFragrance);
+define('swick-search-bar', SwickSearchBar);
+define('swick-combo', SwickCombo);

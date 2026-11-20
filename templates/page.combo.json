@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "combo": {
+      "type": "swick-combo",
+      "blocks": {
+        "step_spray": {
+          "type": "step",
+          "settings": { "title": "Pick a room spray", "collection": "frontpage", "note": "", "limit": 12 }
+        },
+        "step_camphor": {
+          "type": "step",
+          "settings": { "title": "Pick a camphor", "collection": "frontpage", "note": "", "limit": 12 }
+        },
+        "step_oil": {
+          "type": "step",
+          "settings": { "title": "Pick an oil", "collection": "frontpage", "note": "", "limit": 12 }
+        }
+      },
+      "block_order": ["step_spray", "step_camphor", "step_oil"],
+      "settings": {
+        "eyebrow": "Combo offer",
+        "heading": "Build your combo",
+        "combo_price": 999,
+        "offer_prefix": "Any",
+        "offer_joiner": "for",
+        "combo_tag": "buy-3-for-999"
+      }
+    }
+  },
+  "order": ["combo"]
+}
