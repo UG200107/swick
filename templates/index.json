@@ -221,6 +221,7 @@
           "settings": {
             "title": "Bedroom",
             "mood": "Calm & restful",
+            "image": "shopify://shop_images/pexels-c-914608489-19980080.jpg",
             "collection": "",
             "link": "",
             "icon": "bed"
@@ -231,6 +232,7 @@
           "settings": {
             "title": "Bathroom",
             "mood": "Fresh & clean, all day",
+            "image": "shopify://shop_images/pexels-artbovich-6908370.jpg",
             "collection": "",
             "link": "",
             "icon": "bath"
@@ -241,6 +243,7 @@
           "settings": {
             "title": "Living Room",
             "mood": "Warm & welcoming",
+            "image": "shopify://shop_images/pexels-alef-morais-336305364-34277650.jpg",
             "collection": "",
             "link": "",
             "icon": "sofa"
@@ -251,6 +254,7 @@
           "settings": {
             "title": "Car",
             "mood": "Freshness on the go",
+            "image": "shopify://shop_images/pexels-jeremyhann-2974246.jpg",
             "collection": "",
             "link": "",
             "icon": "car"
