@@ -9,16 +9,375 @@
  */
 {
   "sections": {
+    "swick_hero_stage": {
+      "type": "swick-hero-stage",
+      "blocks": {
+        "stage_mist": {
+          "type": "slide",
+          "settings": {
+            "theme_image": "swick-hero-room-sprays.webp",
+            "image_alt": "Swick room sprays in French Lavender, Jasmine Bloom, Sandal Wood and Royal Rose on green podiums",
+            "image_width": 920,
+            "image_height": 1236,
+            "caption": "Handcrafted room mists that turn every corner into a calm ritual.",
+            "link": ""
+          }
+        },
+        "slide_Ftppiw": {
+          "type": "slide",
+          "settings": {
+            "theme_image": "",
+            "image_alt": "",
+            "caption": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "stage_mist",
+        "slide_Ftppiw"
+      ],
+      "settings": {
+        "wordmark_line_1": "Nature.",
+        "wordmark_line_2": "Bottled.",
+        "stack_desktop": false,
+        "wordmark_font": "inter_n7",
+        "wordmark_color": "#617246",
+        "background": "#ffffff",
+        "panel_color": "#e6ecdf",
+        "product_position": "right",
+        "product_size": 80,
+        "mobile_panel_ratio": "4 / 3",
+        "product_size_mobile": 72,
+        "autoplay_seconds": 4,
+        "show_thumbnails": true,
+        "show_arrows": false,
+        "badge_text": "Shop now • Nature bottled •",
+        "badge_label": "Shop now",
+        "badge_link": "shopify://collections/all"
+      }
+    },
+    "swick_trust": {
+      "type": "swick-trust-strip",
+      "blocks": {
+        "trust_offer": {
+          "type": "item",
+          "settings": {
+            "icon": "percent",
+            "line_1": "5% Off",
+            "line_2": "on all selections",
+            "link": ""
+          }
+        },
+        "trust_returns": {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "line_1": "7 Days",
+            "line_2": "Easy Returns",
+            "link": ""
+          }
+        },
+        "trust_shipping": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "line_1": "Free &",
+            "line_2": "Fast Shipping",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "trust_offer",
+        "trust_returns",
+        "trust_shipping"
+      ],
+      "settings": {
+        "background": "#ffffff",
+        "text_color": "#1a1a1a",
+        "icon_color": "#617246"
+      }
+    },
+    "swick_category_grid": {
+      "type": "swick-category-grid",
+      "blocks": {
+        "cat_1": {
+          "type": "category",
+          "settings": {
+            "collection": "",
+            "label": "Blended Camphor",
+            "link": "",
+            "badge": "",
+            "icon": "leaf"
+          }
+        },
+        "cat_2": {
+          "type": "category",
+          "settings": {
+            "collection": "",
+            "label": "Pure Camphor",
+            "link": "",
+            "badge": "",
+            "icon": "camphor"
+          }
+        },
+        "cat_3": {
+          "type": "category",
+          "settings": {
+            "collection": "",
+            "label": "Room Sprays",
+            "link": "",
+            "badge": "",
+            "icon": "spray"
+          }
+        },
+        "cat_4": {
+          "type": "category",
+          "settings": {
+            "collection": "",
+            "label": "Linen Sprays",
+            "link": "",
+            "badge": "",
+            "icon": "linen"
+          }
+        },
+        "cat_5": {
+          "type": "category",
+          "settings": {
+            "collection": "",
+            "label": "Temple Fragrance",
+            "link": "",
+            "badge": "",
+            "icon": "diya"
+          }
+        },
+        "cat_6": {
+          "type": "category",
+          "settings": {
+            "collection": "",
+            "label": "Room Fresheners",
+            "link": "",
+            "badge": "",
+            "icon": "bottle"
+          }
+        },
+        "cat_7": {
+          "type": "category",
+          "settings": {
+            "collection": "",
+            "label": "Aroma Oils",
+            "link": "",
+            "badge": "",
+            "icon": "oil"
+          }
+        },
+        "cat_8": {
+          "type": "category",
+          "settings": {
+            "collection": "",
+            "label": "Discovery Kits",
+            "link": "",
+            "badge": "Try all",
+            "icon": "gift"
+          }
+        },
+        "cat_9": {
+          "type": "category",
+          "settings": {
+            "collection": "",
+            "label": "Bestsellers",
+            "link": "",
+            "badge": "",
+            "icon": "spray"
+          }
+        }
+      },
+      "block_order": [
+        "cat_1",
+        "cat_2",
+        "cat_3",
+        "cat_4",
+        "cat_5",
+        "cat_6",
+        "cat_7",
+        "cat_8",
+        "cat_9"
+      ],
+      "settings": {
+        "heading_light": "Shop by",
+        "heading_bold": "Category",
+        "columns_mobile": 3,
+        "columns_desktop": 5,
+        "shop_all_label": "Shop all",
+        "shop_all_link": "shopify://collections/all"
+      }
+    },
+    "swick_spaces": {
+      "type": "swick-space-grid",
+      "blocks": {
+        "space_bedroom": {
+          "type": "space",
+          "settings": {
+            "title": "Bedroom",
+            "mood": "Calm & restful",
+            "collection": "",
+            "link": "",
+            "icon": "bed"
+          }
+        },
+        "space_bathroom": {
+          "type": "space",
+          "settings": {
+            "title": "Bathroom",
+            "mood": "Fresh & clean, all day",
+            "collection": "",
+            "link": "",
+            "icon": "bath"
+          }
+        },
+        "space_living": {
+          "type": "space",
+          "settings": {
+            "title": "Living Room",
+            "mood": "Warm & welcoming",
+            "collection": "",
+            "link": "",
+            "icon": "sofa"
+          }
+        },
+        "space_car": {
+          "type": "space",
+          "settings": {
+            "title": "Car",
+            "mood": "Freshness on the go",
+            "collection": "",
+            "link": "",
+            "icon": "car"
+          }
+        }
+      },
+      "block_order": [
+        "space_bedroom",
+        "space_bathroom",
+        "space_living",
+        "space_car"
+      ],
+      "settings": {
+        "heading_light": "Scent for",
+        "heading_bold": "Every Space",
+        "subheading": "Pick a room, find its fragrance."
+      }
+    },
+    "swick_promo_banner": {
+      "type": "swick-promo-banner",
+      "settings": {
+        "text_left": "Last few\nbestsellers\nleft",
+        "text_right": "Up to 30% off",
+        "link": "shopify://collections/all",
+        "background": "#efefef",
+        "text_color": "#111111",
+        "spacing_top": 16,
+        "spacing_bottom": 32
+      }
+    },
+    "swick_editorial": {
+      "type": "swick-slideshow",
+      "blocks": {
+        "edit_slide_1": {
+          "type": "slide",
+          "settings": {
+            "headline": "Monsoon\nfresh",
+            "side_text": "Linen\nrituals",
+            "link": "",
+            "headline_color": "#ffffff",
+            "text_color": "#ffffff"
+          }
+        },
+        "edit_slide_2": {
+          "type": "slide",
+          "settings": {
+            "headline": "Sacred\nsmoke",
+            "side_text": "Temple\nedit",
+            "link": "",
+            "headline_color": "#e9b98f",
+            "text_color": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "edit_slide_1",
+        "edit_slide_2"
+      ],
+      "settings": {
+        "mobile_ratio": "tall",
+        "desktop_ratio": "ultrawide",
+        "show_arrows": true,
+        "autoplay_seconds": 0,
+        "spacing_bottom": 0,
+        "accessibility_label": "Seasonal edits"
+      }
+    },
+    "swick_trending": {
+      "type": "swick-product-tabs",
+      "blocks": {
+        "tab_all": {
+          "type": "tab",
+          "settings": {
+            "label": "All",
+            "collection": "all"
+          }
+        },
+        "tab_camphor": {
+          "type": "tab",
+          "settings": {
+            "label": "Camphor",
+            "collection": ""
+          }
+        },
+        "tab_sprays": {
+          "type": "tab",
+          "settings": {
+            "label": "Room Sprays",
+            "collection": ""
+          }
+        },
+        "tab_linen": {
+          "type": "tab",
+          "settings": {
+            "label": "Linen",
+            "collection": ""
+          }
+        },
+        "tab_temple": {
+          "type": "tab",
+          "settings": {
+            "label": "Temple",
+            "collection": ""
+          }
+        }
+      },
+      "block_order": [
+        "tab_all",
+        "tab_camphor",
+        "tab_sprays",
+        "tab_linen",
+        "tab_temple"
+      ],
+      "settings": {
+        "heading": "Trending",
+        "products_per_tab": 6,
+        "view_all_label": "View all"
+      }
+    },
     "hero_jVaWmY": {
       "type": "hero",
-      "disabled": true,
       "blocks": {
         "text_YLPk4p": {
           "type": "text",
           "name": "t:names.heading",
           "settings": {
             "text": "<p>Browse our latest products</p>",
-            "text_color": "{{ settings.color_palette.background }}",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -29,6 +388,7 @@
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
+            "text_color": "{{ settings.color_palette.background }}",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -50,6 +410,7 @@
             "custom_button_background": "rgba(0,0,0,0)",
             "custom_button_text": "{{ settings.color_palette.background }}",
             "custom_button_border": "{{ settings.color_palette.background }}",
+            "link_text_color": "",
             "width": "fit-content",
             "custom_width": 100,
             "width_mobile": "fit-content",
@@ -62,6 +423,7 @@
         "text_YLPk4p",
         "button_H9gpTf"
       ],
+      "disabled": true,
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
@@ -70,6 +432,7 @@
         "custom_mobile_media": false,
         "media_type_1_mobile": "image",
         "media_type_2_mobile": "image",
+        "link": "",
         "open_in_new_tab": false,
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -293,250 +656,6 @@
         "padding-block-end": 48
       }
     },
-    "swick_category_grid": {
-      "type": "swick-category-grid",
-      "blocks": {
-        "cat_1": {
-          "type": "category",
-          "settings": {
-            "label": "Blended Camphor",
-            "icon": "leaf",
-            "badge": "",
-            "link": ""
-          }
-        },
-        "cat_2": {
-          "type": "category",
-          "settings": {
-            "label": "Pure Camphor",
-            "icon": "camphor",
-            "badge": "",
-            "link": ""
-          }
-        },
-        "cat_3": {
-          "type": "category",
-          "settings": {
-            "label": "Room Sprays",
-            "icon": "spray",
-            "badge": "",
-            "link": ""
-          }
-        },
-        "cat_4": {
-          "type": "category",
-          "settings": {
-            "label": "Linen Sprays",
-            "icon": "linen",
-            "badge": "",
-            "link": ""
-          }
-        },
-        "cat_5": {
-          "type": "category",
-          "settings": {
-            "label": "Temple Fragrance",
-            "icon": "diya",
-            "badge": "",
-            "link": ""
-          }
-        },
-        "cat_6": {
-          "type": "category",
-          "settings": {
-            "label": "Room Fresheners",
-            "icon": "bottle",
-            "badge": "",
-            "link": ""
-          }
-        },
-        "cat_7": {
-          "type": "category",
-          "settings": {
-            "label": "Aroma Oils",
-            "icon": "oil",
-            "badge": "",
-            "link": ""
-          }
-        },
-        "cat_8": {
-          "type": "category",
-          "settings": {
-            "label": "Discovery Kits",
-            "icon": "gift",
-            "badge": "Try all",
-            "link": ""
-          }
-        },
-        "cat_9": {
-          "type": "category",
-          "settings": {
-            "label": "Bestsellers",
-            "icon": "spray",
-            "badge": "",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "cat_1",
-        "cat_2",
-        "cat_3",
-        "cat_4",
-        "cat_5",
-        "cat_6",
-        "cat_7",
-        "cat_8",
-        "cat_9"
-      ],
-      "settings": {
-        "heading_light": "Shop by",
-        "heading_bold": "Category",
-        "columns_mobile": 3,
-        "columns_desktop": 5,
-        "shop_all_label": "Shop all",
-        "shop_all_link": "shopify://collections/all"
-      }
-    },
-    "swick_promo_banner": {
-      "type": "swick-promo-banner",
-      "settings": {
-        "text_left": "Last few\nbestsellers\nleft",
-        "text_right": "Up to 30% off",
-        "link": "shopify://collections/all",
-        "background": "#EFEFEF",
-        "text_color": "#111111",
-        "spacing_top": 16,
-        "spacing_bottom": 32
-      }
-    },
-    "swick_editorial": {
-      "type": "swick-slideshow",
-      "blocks": {
-        "edit_slide_1": {
-          "type": "slide",
-          "settings": {
-            "headline": "Monsoon\nfresh",
-            "side_text": "Linen\nrituals",
-            "link": "",
-            "headline_color": "#FFFFFF",
-            "text_color": "#FFFFFF"
-          }
-        },
-        "edit_slide_2": {
-          "type": "slide",
-          "settings": {
-            "headline": "Sacred\nsmoke",
-            "side_text": "Temple\nedit",
-            "link": "",
-            "headline_color": "#E9B98F",
-            "text_color": "#FFFFFF"
-          }
-        }
-      },
-      "block_order": [
-        "edit_slide_1",
-        "edit_slide_2"
-      ],
-      "settings": {
-        "mobile_ratio": "tall",
-        "desktop_ratio": "ultrawide",
-        "show_arrows": true,
-        "autoplay_seconds": 0,
-        "spacing_bottom": 0,
-        "accessibility_label": "Seasonal edits"
-      }
-    },
-    "swick_trending": {
-      "type": "swick-product-tabs",
-      "blocks": {
-        "tab_all": {
-          "type": "tab",
-          "settings": {
-            "label": "All",
-            "collection": "all"
-          }
-        },
-        "tab_camphor": {
-          "type": "tab",
-          "settings": {
-            "label": "Camphor",
-            "collection": ""
-          }
-        },
-        "tab_sprays": {
-          "type": "tab",
-          "settings": {
-            "label": "Room Sprays",
-            "collection": ""
-          }
-        },
-        "tab_linen": {
-          "type": "tab",
-          "settings": {
-            "label": "Linen",
-            "collection": ""
-          }
-        },
-        "tab_temple": {
-          "type": "tab",
-          "settings": {
-            "label": "Temple",
-            "collection": ""
-          }
-        }
-      },
-      "block_order": [
-        "tab_all",
-        "tab_camphor",
-        "tab_sprays",
-        "tab_linen",
-        "tab_temple"
-      ],
-      "settings": {
-        "heading": "Trending",
-        "products_per_tab": 6,
-        "view_all_label": "View all"
-      }
-    },
-    "swick_hero_stage": {
-      "type": "swick-hero-stage",
-      "blocks": {
-        "stage_mist": {
-          "type": "slide",
-          "settings": {
-            "caption": "Handcrafted room mists that turn every corner into a calm ritual.",
-            "link": "",
-            "theme_image": "swick-hero-room-sprays.webp",
-            "image_alt": "Swick room sprays in French Lavender, Jasmine Bloom, Sandal Wood and Royal Rose on green podiums",
-            "image_width": 920,
-            "image_height": 1236
-          }
-        }
-      },
-      "block_order": [
-        "stage_mist"
-      ],
-      "settings": {
-        "wordmark_line_1": "Nature.",
-        "wordmark_line_2": "Bottled.",
-        "stack_desktop": false,
-        "wordmark_font": "inter_n7",
-        "wordmark_color": "#617246",
-        "background": "#FFFFFF",
-        "panel_color": "#E6ECDF",
-        "product_size": 80,
-        "mobile_panel_ratio": "4 / 3",
-        "product_size_mobile": 72,
-        "autoplay_seconds": 4,
-        "show_thumbnails": true,
-        "show_arrows": false,
-        "badge_text": "Shop now • Nature bottled •",
-        "badge_label": "Shop now",
-        "badge_link": "shopify://collections/all",
-        "product_position": "right"
-      }
-    },
     "swick_hero_slideshow": {
       "type": "swick-slideshow",
       "blocks": {
@@ -577,6 +696,7 @@
         "hero_slide_2",
         "hero_slide_3"
       ],
+      "disabled": true,
       "settings": {
         "mobile_ratio": "square",
         "desktop_ratio": "wide",
@@ -584,101 +704,6 @@
         "autoplay_seconds": 5,
         "spacing_bottom": 0,
         "accessibility_label": "Featured collections"
-      },
-      "disabled": true
-    },
-    "swick_trust": {
-      "type": "swick-trust-strip",
-      "blocks": {
-        "trust_offer": {
-          "type": "item",
-          "settings": {
-            "icon": "percent",
-            "line_1": "5% Off",
-            "line_2": "on all selections",
-            "link": ""
-          }
-        },
-        "trust_returns": {
-          "type": "item",
-          "settings": {
-            "icon": "return",
-            "line_1": "7 Days",
-            "line_2": "Easy Returns",
-            "link": ""
-          }
-        },
-        "trust_shipping": {
-          "type": "item",
-          "settings": {
-            "icon": "truck",
-            "line_1": "Free &",
-            "line_2": "Fast Shipping",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "trust_offer",
-        "trust_returns",
-        "trust_shipping"
-      ],
-      "settings": {
-        "background": "#FFFFFF",
-        "text_color": "#1A1A1A",
-        "icon_color": "#617246"
-      }
-    },
-    "swick_spaces": {
-      "type": "swick-space-grid",
-      "blocks": {
-        "space_bedroom": {
-          "type": "space",
-          "settings": {
-            "title": "Bedroom",
-            "mood": "Calm & restful",
-            "icon": "bed",
-            "link": ""
-          }
-        },
-        "space_bathroom": {
-          "type": "space",
-          "settings": {
-            "title": "Bathroom",
-            "mood": "Fresh & clean, all day",
-            "icon": "bath",
-            "link": ""
-          }
-        },
-        "space_living": {
-          "type": "space",
-          "settings": {
-            "title": "Living Room",
-            "mood": "Warm & welcoming",
-            "icon": "sofa",
-            "link": ""
-          }
-        },
-        "space_car": {
-          "type": "space",
-          "settings": {
-            "title": "Car",
-            "mood": "Freshness on the go",
-            "icon": "car",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "space_bedroom",
-        "space_bathroom",
-        "space_living",
-        "space_car"
-      ],
-      "settings": {
-        "heading_light": "Scent for",
-        "heading_bold": "Every Space",
-        "subheading": "Pick a room, find its fragrance."
       }
     }
   },
