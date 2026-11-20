@@ -73,8 +73,9 @@
       display: none;
     }
 
-    body:has(.swick-bnav--hide-header-cart) [data-testid='cart-drawer-trigger'],
-    body:has(.swick-bnav--hide-header-cart) .header-actions__action.action__cart {
+    /* Product pages hide this bar (the sticky Add to Bag takes its place), so keep the header bag there. */
+    body:has(.swick-bnav--hide-header-cart):not(:has(.swick-pdp)) [data-testid='cart-drawer-trigger'],
+    body:has(.swick-bnav--hide-header-cart):not(:has(.swick-pdp)) .header-actions__action.action__cart {
       display: none;
     }
   }

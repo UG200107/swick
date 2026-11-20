@@ -1,7 +1,7 @@
 {%- doc -%}
   Thin-stroke (1.5px) monochrome icon set for Swick sections. Decorative: always aria-hidden.
 
-  @param {string} icon - heart | plus | chevron-left | chevron-right | home | menu | new | bag | store | search | user | bottle | camphor | spray | linen | diya | oil | leaf | gift
+  @param {string} icon - heart | plus | chevron-left | chevron-right | home | menu | new | bag | store | search | user | bottle | camphor | spray | linen | diya | oil | leaf | gift | percent | return | truck | bed | bath | sofa | car
   @param {string} [class] - Extra class for the svg element.
 
   @example
@@ -58,6 +58,20 @@
       <path d="M12 3.5c3.4 4.6 6 8 6 11a6 6 0 0 1-12 0c0-3 2.6-6.4 6-11Z"/><path d="M9 15a3 3 0 0 0 3 3"/>
     {%- when 'gift' -%}
       <rect x="4" y="9" width="16" height="11" rx="1"/><path d="M3 9h18M12 9v11M12 9c-1.5-3.5-5.5-4-5.5-1.5S12 9 12 9Zm0 0c1.5-3.5 5.5-4 5.5-1.5S12 9 12 9Z"/>
+    {%- when 'bed' -%}
+      <path d="M3 18.5V7M3 14h18v4.5M21 14v-2.5a2.5 2.5 0 0 0-2.5-2.5H11v5"/><circle cx="7" cy="11.2" r="1.8"/>
+    {%- when 'bath' -%}
+      <path d="M3 12h18v2a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5v-2Z"/><path d="M6 12V6a2 2 0 0 1 3.6-1.2M7 19l-1 2M17 19l1 2"/><path d="M9 6.5h2"/>
+    {%- when 'sofa' -%}
+      <path d="M5 11V8.5A2.5 2.5 0 0 1 7.5 6h9A2.5 2.5 0 0 1 19 8.5V11"/><path d="M3 13a2 2 0 0 1 4 0v1.5h10V13a2 2 0 0 1 4 0v4.5H3V13Z"/><path d="M5 17.5V19M19 17.5V19"/>
+    {%- when 'car' -%}
+      <path d="M4 15v-2.5l1.6-4.2A2 2 0 0 1 7.5 7h9a2 2 0 0 1 1.9 1.3l1.6 4.2V15"/><path d="M3 15h18v2.5H3z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/><path d="M5.5 12h13"/>
+    {%- when 'percent' -%}
+      <path d="M11 3.5 4 10.5l8 8 7-7V4.5a1 1 0 0 0-1-1h-7Z"/><path d="m9.5 14.5 5-5"/><circle cx="10" cy="10" r="1"/><circle cx="14" cy="14" r="1"/>
+    {%- when 'return' -%}
+      <path d="M4.5 9A8 8 0 1 1 4 13.5"/><path d="M4.5 4.5V9H9"/><path d="m12 8 3.5 2v4L12 16l-3.5-2v-4L12 8Z"/><path d="m8.5 10 3.5 2 3.5-2M12 12v4"/>
+    {%- when 'truck' -%}
+      <path d="M2.5 6.5h11v9h-11z"/><path d="M13.5 9.5h4l3 3.5v2.5h-7"/><circle cx="6.5" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/>
     {%- else -%}
       <path d="M5 19C5 11 10 5.5 19 5c0 9-5 14-14 14Z"/><path d="m5 19 7.5-7.5"/>
   {%- endcase -%}

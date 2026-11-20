@@ -536,7 +536,8 @@
         "show_arrows": false,
         "badge_text": "Shop now • Nature bottled • ",
         "badge_label": "Shop now",
-        "badge_link": "shopify://collections/all"
+        "badge_link": "shopify://collections/all",
+        "product_position": "right"
       }
     },
     "swick_hero_slideshow": {
@@ -588,11 +589,107 @@
         "accessibility_label": "Featured collections"
       },
       "disabled": true
+    },
+    "swick_trust": {
+      "type": "swick-trust-strip",
+      "blocks": {
+        "trust_offer": {
+          "type": "item",
+          "settings": {
+            "icon": "percent",
+            "line_1": "5% Off",
+            "line_2": "on all selections",
+            "link": ""
+          }
+        },
+        "trust_returns": {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "line_1": "7 Days",
+            "line_2": "Easy Returns",
+            "link": ""
+          }
+        },
+        "trust_shipping": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "line_1": "Free &",
+            "line_2": "Fast Shipping",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "trust_offer",
+        "trust_returns",
+        "trust_shipping"
+      ],
+      "settings": {
+        "background": "#FFFFFF",
+        "text_color": "#1A1A1A",
+        "icon_color": "#617246"
+      }
+    },
+    "swick_spaces": {
+      "type": "swick-space-grid",
+      "blocks": {
+        "space_bedroom": {
+          "type": "space",
+          "settings": {
+            "title": "Bedroom",
+            "mood": "Calm & restful",
+            "icon": "bed",
+            "link": ""
+          }
+        },
+        "space_bathroom": {
+          "type": "space",
+          "settings": {
+            "title": "Bathroom",
+            "mood": "Fresh & clean, all day",
+            "icon": "bath",
+            "link": ""
+          }
+        },
+        "space_living": {
+          "type": "space",
+          "settings": {
+            "title": "Living Room",
+            "mood": "Warm & welcoming",
+            "icon": "sofa",
+            "link": ""
+          }
+        },
+        "space_car": {
+          "type": "space",
+          "settings": {
+            "title": "Car",
+            "mood": "Freshness on the go",
+            "icon": "car",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "space_bedroom",
+        "space_bathroom",
+        "space_living",
+        "space_car"
+      ],
+      "settings": {
+        "heading_light": "Scent for",
+        "heading_bold": "Every Space",
+        "subheading": "Pick a room, find its fragrance."
+      }
     }
   },
   "order": [
     "swick_hero_stage",
+    "swick_trust",
     "swick_category_grid",
+    "swick_spaces",
     "swick_promo_banner",
     "swick_editorial",
     "swick_trending",

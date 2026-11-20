@@ -452,8 +452,8 @@
   }
 
   .swick-pdp__wish[aria-pressed='true'] svg path {
-    fill: var(--swick-accent, #c27d48);
-    stroke: var(--swick-accent, #c27d48);
+    fill: #617246;
+    stroke: #617246;
   }
 
   .swick-pdp__count {
@@ -500,7 +500,8 @@
 
   /* ---------- Gallery ---------- */
   .swick-slideshow.swick-pdp__slides {
-    --swick-ratio: 3 / 4;
+    /* Square: product photos are shot 1:1. */
+    --swick-ratio: 1 / 1;
     background-color: var(--swick-soft, #f2f2f2);
   }
 
@@ -585,7 +586,7 @@
   .swick-pdp__off {
     font-size: 13px;
     font-weight: 600;
-    color: var(--swick-accent, #c27d48);
+    color: #617246;
   }
 
   .swick-pdp__compare[hidden],
@@ -749,7 +750,7 @@
   }
 
   .swick-pdp__value:focus-visible {
-    outline: 2px solid var(--swick-accent, #c27d48);
+    outline: 2px solid #617246;
     outline-offset: 2px;
   }
 
@@ -787,19 +788,26 @@
       inset-block-end: 0;
       z-index: 15;
       margin: 0;
-      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-      background: linear-gradient(to top, #fff 60%, rgb(255 255 255 / 0));
+      padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+      background: none;
+      pointer-events: none;
+    }
+
+    .swick-pdp__atc-bar > * {
+      pointer-events: auto;
     }
   }
 
+  /* Rounded, solid button. */
   .swick-pdp__atc {
     display: block;
     width: 100%;
     min-height: 52px;
     padding: 14px 16px;
     border: 0;
-    border-radius: 0;
+    border-radius: 999px;
     background-color: var(--swick-ink, #111);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
     color: #fff;
     font-family: var(--font-body--family);
     font-size: 17px;
@@ -815,11 +823,12 @@
   }
 
   .swick-pdp__atc.is-added {
-    background-color: var(--swick-accent, #c27d48);
+    background-color: #617246;
   }
 
+
   .swick-pdp__atc:focus-visible {
-    outline: 2px solid var(--swick-accent, #c27d48);
+    outline: 2px solid #617246;
     outline-offset: 2px;
   }
 
@@ -951,20 +960,23 @@
     font-size: 16px;
     font-weight: 700;
     text-transform: uppercase;
-    color: var(--swick-accent, #c27d48);
+    color: #617246;
     cursor: pointer;
   }
 
   .swick-pin__msg {
     margin: 14px 0 0;
     padding: 12px 16px;
-    background-color: var(--swick-soft, #f2f2f2);
+    background-color: #f3f5ef;
     font-size: 14px;
     color: var(--swick-ink, #111);
   }
 
+  /* Warnings: pale sage with an olive edge (theme), instead of pink. */
   .swick-pin__msg.is-warn {
-    background-color: #f3c9b9;
+    background-color: #eef2e8;
+    box-shadow: inset 3px 0 0 #617246;
+    color: #3f4a2e;
   }
 
   .swick-pin__msg[hidden] {
@@ -1007,7 +1019,7 @@
   }
 
   .swick-notes__pip.is-on {
-    background-color: var(--swick-accent, #c27d48);
+    background-color: #617246;
   }
 
   .swick-pdp__app {
@@ -1030,7 +1042,7 @@
       "id": "own_header_mobile",
       "label": "Use floating top bar on phones",
       "info": "Hides the theme header on this page on phones and shows back, share, wishlist and bag icons over the gallery.",
-      "default": true
+      "default": false
     },
     {
       "type": "checkbox",

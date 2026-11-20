@@ -1,0 +1,211 @@
+{%- comment -%}
+  Swick — trust strip: a pale band of short promises (offer, returns, shipping).
+  Phones: three columns, icon above two short lines. Desktop: icon beside text, spread across.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+-%}
+
+{% render 'swick-assets' %}
+
+<div
+  class="swick-trust"
+  style="--swick-trust-bg: {{ s.background }}; --swick-trust-ink: {{ s.text_color }}; --swick-trust-icon: {{ s.icon_color }};"
+>
+  <ul class="swick-trust__list" role="list">
+    {%- for block in section.blocks -%}
+      {%- assign b = block.settings -%}
+      <li class="swick-trust__item" {{ block.shopify_attributes }}>
+        {%- if b.link != blank -%}<a href="{{ b.link }}" class="swick-trust__inner swick-trust__inner--link">{%- else -%}<div class="swick-trust__inner">{%- endif -%}
+          <span class="swick-trust__icon" aria-hidden="true">
+            {%- render 'swick-icon', icon: b.icon -%}
+          </span>
+          <span class="swick-trust__text">
+            <span class="swick-trust__line swick-trust__line--strong">{{ b.line_1 | escape }}</span>
+            {%- if b.line_2 != blank -%}
+              <span class="swick-trust__line">{{ b.line_2 | escape }}</span>
+            {%- endif -%}
+          </span>
+        {%- if b.link != blank -%}</a>{%- else -%}</div>{%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+
+{% stylesheet %}
+  .swick-trust {
+    background-color: var(--swick-trust-bg, #fff);
+    color: var(--swick-trust-ink, #1a1a1a);
+  }
+
+  .swick-trust__list {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 6px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 10px;
+    list-style: none;
+  }
+
+  .swick-trust__item {
+    min-width: 0;
+  }
+
+  .swick-trust__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .swick-trust__icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    color: var(--swick-trust-icon, #617246);
+  }
+
+  .swick-trust__icon svg {
+    width: 26px;
+    height: 26px;
+    stroke-width: 1.6;
+  }
+
+  .swick-trust__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .swick-trust__line {
+    font-family: var(--font-body--family);
+    font-size: 11.5px;
+    font-weight: 400;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .swick-trust__line--strong {
+    font-weight: 600;
+  }
+
+  .swick-trust__inner--link:focus-visible {
+    outline: 2px solid var(--swick-trust-icon, #617246);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-trust__list {
+      justify-content: space-between;
+      grid-auto-columns: auto;
+      padding: 16px 48px;
+    }
+
+    .swick-trust__inner {
+      flex-direction: row;
+      gap: 12px;
+    }
+
+    .swick-trust__icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .swick-trust__icon svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .swick-trust__line {
+      font-size: 15px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick trust strip",
+  "tag": "section",
+  "class": "swick-trust-section",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icons",
+      "default": "#617246"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Promise",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "percent", "label": "Discount tag" },
+            { "value": "return", "label": "Returns" },
+            { "value": "truck", "label": "Delivery truck" },
+            { "value": "gift", "label": "Gift" },
+            { "value": "leaf", "label": "Leaf" },
+            { "value": "heart", "label": "Heart" }
+          ],
+          "default": "percent"
+        },
+        {
+          "type": "text",
+          "id": "line_1",
+          "label": "First line",
+          "default": "5% Off"
+        },
+        {
+          "type": "text",
+          "id": "line_2",
+          "label": "Second line",
+          "default": "on all selections"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional, e.g. your returns policy page."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick trust strip",
+      "blocks": [
+        { "type": "item", "settings": { "icon": "percent", "line_1": "5% Off", "line_2": "on all selections" } },
+        { "type": "item", "settings": { "icon": "return", "line_1": "7 Days", "line_2": "Easy Returns" } },
+        { "type": "item", "settings": { "icon": "truck", "line_1": "Free &", "line_2": "Fast Shipping" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

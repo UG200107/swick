@@ -526,7 +526,7 @@
         "acc_returns"
       ],
       "settings": {
-        "own_header_mobile": true,
+        "own_header_mobile": false,
         "preselect_variant": false,
         "tax_note": "*MRP inclusive of all taxes",
         "offer_text": "Get 10% off on prepaid UPI orders",

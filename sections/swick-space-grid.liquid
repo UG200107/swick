@@ -1,0 +1,340 @@
+{%- comment -%}
+  Swick — "Scent for / Every Space": lifestyle tiles that send shoppers to fragrances for a
+  particular room (bedroom, bathroom, living room, car…).
+  Phones: 2×2 grid. Desktop: one row. Each tile: photo (or a soft tinted placeholder with a
+  line icon), space name, a short mood line and an arrow. The whole tile is one link.
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign tile_count = section.blocks.size
+-%}
+
+{% render 'swick-assets' %}
+
+<div class="swick-spaces" style="--swick-spaces-cols-d: {{ tile_count | at_most: 6 | at_least: 2 }};">
+  {%- if s.heading_light != blank or s.heading_bold != blank -%}
+    <div class="swick-spaces__head">
+      <h2 class="swick-title">
+        {%- if s.heading_light != blank -%}<span class="swick-title__light">{{ s.heading_light | escape }}</span>{%- endif -%}
+        {%- if s.heading_bold != blank -%}<span class="swick-title__bold">{{ s.heading_bold | escape }}</span>{%- endif -%}
+      </h2>
+      {%- if s.subheading != blank -%}
+        <p class="swick-spaces__sub">{{ s.subheading | escape }}</p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <ul class="swick-spaces__grid" role="list">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign b = block.settings
+        assign url = b.link | default: b.collection.url | default: routes.all_products_collection_url
+        assign img = b.image | default: b.collection.featured_image
+        assign tone = forloop.index0 | modulo: 4
+      -%}
+      <li class="swick-spaces__cell" {{ block.shopify_attributes }}>
+        <a href="{{ url }}" class="swick-spaces__tile">
+          <span class="swick-spaces__media">
+            {%- if img != blank -%}
+              {{
+                img
+                | image_url: width: 900
+                | image_tag:
+                  widths: '300, 450, 600, 900',
+                  sizes: '(min-width: 750px) 25vw, 50vw',
+                  loading: 'lazy',
+                  alt: '',
+                  class: 'swick-spaces__img'
+              }}
+            {%- else -%}
+              <span class="swick-spaces__ph swick-spaces__ph--{{ tone }}" aria-hidden="true">
+                {%- render 'swick-icon', icon: b.icon, class: 'swick-spaces__ph-icon' -%}
+              </span>
+            {%- endif -%}
+            <span class="swick-spaces__scrim" aria-hidden="true"></span>
+          </span>
+          <span class="swick-spaces__copy">
+            <span class="swick-spaces__name">{{ b.title | escape }}</span>
+            {%- if b.mood != blank -%}
+              <span class="swick-spaces__mood">{{ b.mood | escape }}</span>
+            {%- endif -%}
+          </span>
+          <span class="swick-spaces__arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </span>
+        </a>
+      </li>
+    {%- endfor -%}
+  </ul>
+</div>
+
+{% stylesheet %}
+  .swick-spaces {
+    padding-block: 28px 32px;
+    background-color: var(--swick-surface, #fff);
+  }
+
+  .swick-spaces__head {
+    padding-inline: var(--swick-gutter, 16px);
+    padding-block-end: 16px;
+  }
+
+  .swick-spaces__sub {
+    margin: 8px 0 0;
+    font-family: var(--font-body--family);
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--swick-muted, #6b6b6b);
+  }
+
+  .swick-spaces__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0 var(--swick-gutter, 16px);
+    list-style: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-spaces__head {
+      padding-inline: 48px;
+    }
+
+    .swick-spaces__grid {
+      grid-template-columns: repeat(var(--swick-spaces-cols-d, 4), minmax(0, 1fr));
+      gap: 12px;
+      padding-inline: 48px;
+    }
+  }
+
+  .swick-spaces__cell {
+    min-width: 0;
+  }
+
+  .swick-spaces__tile {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: 14px;
+    color: #fff;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .swick-spaces__media,
+  .swick-spaces__img,
+  .swick-spaces__ph {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .swick-spaces__img {
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Placeholders: soft sage / clay / linen tints that sit with the hero palette. */
+  .swick-spaces__ph {
+    display: grid;
+    place-items: center;
+    padding-block-end: 22%;
+    color: rgb(255 255 255 / 0.75);
+  }
+
+  .swick-spaces__ph--0 { background: linear-gradient(160deg, #8fa27a 0%, #5d6f47 100%); }
+  .swick-spaces__ph--1 { background: linear-gradient(160deg, #9fb8b3 0%, #5f7d78 100%); }
+  .swick-spaces__ph--2 { background: linear-gradient(160deg, #c9a888 0%, #8f6b4f 100%); }
+  .swick-spaces__ph--3 { background: linear-gradient(160deg, #8e9488 0%, #4e554a 100%); }
+
+  .swick-spaces__ph-icon {
+    width: 42%;
+    height: auto;
+    stroke-width: 1;
+  }
+
+  .swick-spaces__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.5) 0%, rgb(0 0 0 / 0) 55%);
+    pointer-events: none;
+  }
+
+  .swick-spaces__copy {
+    position: absolute;
+    inset-inline: 12px 40px;
+    inset-block-end: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .swick-spaces__name {
+    font-family: var(--font-body--family);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .swick-spaces__mood {
+    font-family: var(--font-body--family);
+    font-size: 11.5px;
+    font-weight: 300;
+    line-height: 1.3;
+    color: rgb(255 255 255 / 0.9);
+  }
+
+  .swick-spaces__arrow {
+    position: absolute;
+    inset-inline-end: 10px;
+    inset-block-end: 12px;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: rgb(255 255 255 / 0.9);
+    color: #617246;
+    transition: transform 0.3s ease;
+  }
+
+  @media screen and (min-width: 750px) {
+    .swick-spaces__name {
+      font-size: 18px;
+    }
+
+    .swick-spaces__mood {
+      font-size: 13px;
+    }
+
+    .swick-spaces__copy {
+      inset-inline: 16px 48px;
+      inset-block-end: 16px;
+    }
+
+    .swick-spaces__arrow {
+      inset-inline-end: 14px;
+      inset-block-end: 16px;
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .swick-spaces__tile:hover .swick-spaces__img {
+      transform: scale(1.04);
+    }
+
+    .swick-spaces__tile:hover .swick-spaces__arrow {
+      transform: translate(2px, -2px);
+    }
+  }
+
+  .swick-spaces__tile:focus-visible {
+    outline: 2px solid #617246;
+    outline-offset: 3px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Swick shop by space",
+  "tag": "section",
+  "class": "swick-spaces-section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_light",
+      "label": "Heading (light line)",
+      "default": "Scent for"
+    },
+    {
+      "type": "text",
+      "id": "heading_bold",
+      "label": "Heading (bold line)",
+      "default": "Every Space"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Pick a room, find its fragrance."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "space",
+      "name": "Space",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Space name",
+          "default": "Bedroom"
+        },
+        {
+          "type": "text",
+          "id": "mood",
+          "label": "Mood line",
+          "default": "Calm & restful"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "A lifestyle photo of the room, portrait 4:5, 900px wide or more."
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection",
+          "info": "Fills in the link, and the image when none is set."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Overrides the collection link."
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Placeholder icon",
+          "info": "Shown when there is no image.",
+          "options": [
+            { "value": "bed", "label": "Bed" },
+            { "value": "bath", "label": "Bathtub" },
+            { "value": "sofa", "label": "Sofa" },
+            { "value": "car", "label": "Car" },
+            { "value": "diya", "label": "Diya (pooja room)" },
+            { "value": "leaf", "label": "Leaf" }
+          ],
+          "default": "bed"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Swick shop by space",
+      "blocks": [
+        { "type": "space", "settings": { "title": "Bedroom", "mood": "Calm & restful", "icon": "bed" } },
+        { "type": "space", "settings": { "title": "Bathroom", "mood": "Fresh & clean, all day", "icon": "bath" } },
+        { "type": "space", "settings": { "title": "Living Room", "mood": "Warm & welcoming", "icon": "sofa" } },
+        { "type": "space", "settings": { "title": "Car", "mood": "Freshness on the go", "icon": "car" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
