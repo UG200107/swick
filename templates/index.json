@@ -302,7 +302,8 @@
             "label": "Blended Camphor",
             "icon": "leaf",
             "badge": "",
-            "link": ""
+            "link": "",
+            "collection": ""
           }
         },
         "cat_2": {
@@ -311,7 +312,8 @@
             "label": "Pure Camphor",
             "icon": "camphor",
             "badge": "",
-            "link": ""
+            "link": "",
+            "collection": ""
           }
         },
         "cat_3": {
@@ -320,7 +322,8 @@
             "label": "Room Sprays",
             "icon": "spray",
             "badge": "",
-            "link": ""
+            "link": "",
+            "collection": ""
           }
         },
         "cat_4": {
@@ -329,7 +332,8 @@
             "label": "Linen Sprays",
             "icon": "linen",
             "badge": "",
-            "link": ""
+            "link": "",
+            "collection": ""
           }
         },
         "cat_5": {
@@ -338,7 +342,8 @@
             "label": "Temple Fragrance",
             "icon": "diya",
             "badge": "",
-            "link": ""
+            "link": "",
+            "collection": ""
           }
         },
         "cat_6": {
@@ -347,7 +352,8 @@
             "label": "Room Fresheners",
             "icon": "bottle",
             "badge": "",
-            "link": ""
+            "link": "",
+            "collection": ""
           }
         },
         "cat_7": {
@@ -356,7 +362,8 @@
             "label": "Aroma Oils",
             "icon": "oil",
             "badge": "",
-            "link": ""
+            "link": "",
+            "collection": ""
           }
         },
         "cat_8": {
@@ -365,7 +372,8 @@
             "label": "Discovery Kits",
             "icon": "gift",
             "badge": "Try all",
-            "link": ""
+            "link": "",
+            "collection": ""
           }
         },
         "cat_9": {
@@ -374,7 +382,8 @@
             "label": "Bestsellers",
             "icon": "spray",
             "badge": "",
-            "link": ""
+            "link": "",
+            "collection": ""
           }
         }
       },
@@ -512,10 +521,20 @@
             "image_width": 920,
             "image_height": 1236
           }
+        },
+        "slide_Ftppiw": {
+          "type": "slide",
+          "settings": {
+            "theme_image": "",
+            "image_alt": "",
+            "caption": "",
+            "link": ""
+          }
         }
       },
       "block_order": [
-        "stage_mist"
+        "stage_mist",
+        "slide_Ftppiw"
       ],
       "settings": {
         "wordmark_line_1": "Nature.",
@@ -638,7 +657,9 @@
             "title": "Bedroom",
             "mood": "Calm & restful",
             "icon": "bed",
-            "link": ""
+            "link": "",
+            "image": "shopify://shop_images/pexels-c-914608489-19980080.jpg",
+            "collection": ""
           }
         },
         "space_bathroom": {
@@ -647,7 +668,9 @@
             "title": "Bathroom",
             "mood": "Fresh & clean, all day",
             "icon": "bath",
-            "link": ""
+            "link": "",
+            "image": "shopify://shop_images/pexels-artbovich-6908370.jpg",
+            "collection": ""
           }
         },
         "space_living": {
@@ -656,7 +679,9 @@
             "title": "Living Room",
             "mood": "Warm & welcoming",
             "icon": "sofa",
-            "link": ""
+            "link": "",
+            "image": "shopify://shop_images/pexels-alef-morais-336305364-34277650.jpg",
+            "collection": ""
           }
         },
         "space_car": {
@@ -665,7 +690,9 @@
             "title": "Car",
             "mood": "Freshness on the go",
             "icon": "car",
-            "link": ""
+            "link": "",
+            "image": "shopify://shop_images/pexels-jeremyhann-2974246.jpg",
+            "collection": ""
           }
         }
       },
